@@ -65,3 +65,104 @@ section:nth-child(odd)
 {
     justify-content: flex-end;
 }
+
+@media (max-width: 768px)
+{
+    html,
+    body
+    {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+
+    body
+    {
+        min-height: 100svh;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(112px, 34vw);
+        align-content: start;
+        row-gap: 2.5svh;
+        padding: calc(env(safe-area-inset-top) + 2svh) 24px 8svh;
+    }
+
+    .webgl
+    {
+        width: 100vw;
+        height: 100svh;
+    }
+
+    .section
+    {
+        grid-column: 1 / 2;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        font-size: clamp(1.2rem, 6vw, 1.9rem);
+        padding-left: 0;
+        padding-right: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .section h1,
+    .section h2
+    {
+        max-width: 8ch;
+    }
+
+    .last-name
+    {
+        margin-left: 0.14em;
+    }
+
+    .hero-title
+    {
+        line-height: 0.99;
+    }
+
+    .section:first-of-type
+    {
+        grid-column: 1 / -1;
+        font-size: clamp(1.85rem, 9.5vw, 2.9rem);
+        margin-bottom: 3svh;
+        align-items: flex-start;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .section:first-of-type .hero-title
+    {
+        max-width: none;
+        width: 100%;
+    }
+
+    .section:first-of-type .last-name
+    {
+        margin-left: 0;
+    }
+
+    .section:nth-of-type(2),
+    .section:nth-of-type(3)
+    {
+        margin-top: 1.5svh;
+    }
+
+    .section:nth-of-type(3)
+    {
+        margin-top: 50svh;
+    }
+
+    .section:nth-of-type(3) h2,
+    .section:nth-of-type(3) .section-link
+    {
+        max-width: none;
+        white-space: nowrap;
+    }
+
+    section:nth-child(odd)
+    {
+        justify-content: flex-start;
+    }
+}

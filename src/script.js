@@ -10,6 +10,7 @@ const parameters = {
  */
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
+const sections = Array.from(document.querySelectorAll('.section'))
 
 // Scene
 const scene = new THREE.Scene()
@@ -46,10 +47,6 @@ const mesh3 = new THREE.Mesh(
 mesh1.position.x = 2
 mesh2.position.x = - 2
 mesh3.position.x = 2
-
-mesh1.position.y = - objectsDistance * 0
-mesh2.position.y = - objectsDistance * 1
-mesh3.position.y = - objectsDistance * 2
 
 scene.add(mesh1, mesh2, mesh3)
 
@@ -98,21 +95,6 @@ const sizes = {
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
-
 /**
  * Camera
  */
@@ -125,6 +107,30 @@ const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 
 camera.position.z = 6
 cameraGroup.add(camera)
 
+const getSectionHeight = () =>
+{
+    return sections[0]?.getBoundingClientRect().height || sizes.height
+}
+
+const updateLayout = () =>
+{
+    const isMobile = sizes.width <= 768
+    const horizontalOffset = isMobile ? 0.95 : 2
+    const verticalOffset = isMobile ? - 0.95 : 0
+
+    mesh1.position.x = horizontalOffset
+    mesh2.position.x = - horizontalOffset
+    mesh3.position.x = horizontalOffset
+
+    mesh1.position.y = - objectsDistance * 0 + verticalOffset
+    mesh2.position.y = - objectsDistance * 1 + verticalOffset
+    mesh3.position.y = - objectsDistance * 2 + verticalOffset
+
+    camera.position.z = isMobile ? 8.8 : 6
+}
+
+updateLayout()
+
 /**
  * Renderer
  */
@@ -135,6 +141,22 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
+window.addEventListener('resize', () =>
+{
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+    updateLayout()
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
+
 /**
  * Scroll
  */
@@ -144,7 +166,7 @@ let currentSection = 0
 window.addEventListener('scroll', () =>
 {
     scrollY = window.scrollY
-    const newSection = Math.round(scrollY / sizes.height)
+    const newSection = Math.round(scrollY / getSectionHeight())
 
     if(newSection != currentSection)
     {
@@ -170,11 +192,68 @@ const cursor = {}
 cursor.x = 0
 cursor.y = 0
 
+const touch = {
+    active: false,
+    x: 0,
+    y: 0,
+    rotationX: 0,
+    rotationY: 0
+}
+
+const getActiveMesh = () =>
+{
+    return sectionMeshes[Math.min(currentSection, sectionMeshes.length - 1)]
+}
+
 window.addEventListener('mousemove', (event) =>
 {
     cursor.x = event.clientX / sizes.width - 0.5
     cursor.y = event.clientY / sizes.height - 0.5
 })
+
+window.addEventListener('touchstart', (event) =>
+{
+    const firstTouch = event.touches[0]
+
+    if(! firstTouch)
+    {
+        return
+    }
+
+    touch.active = true
+    touch.x = firstTouch.clientX
+    touch.y = firstTouch.clientY
+    cursor.x = firstTouch.clientX / sizes.width - 0.5
+    cursor.y = firstTouch.clientY / sizes.height - 0.5
+}, { passive: true })
+
+window.addEventListener('touchmove', (event) =>
+{
+    const firstTouch = event.touches[0]
+
+    if(! touch.active || ! firstTouch)
+    {
+        return
+    }
+
+    const deltaX = (firstTouch.clientX - touch.x) / sizes.width
+    const deltaY = (firstTouch.clientY - touch.y) / sizes.height
+
+    touch.x = firstTouch.clientX
+    touch.y = firstTouch.clientY
+    touch.rotationY += deltaX * 14
+    touch.rotationX += deltaY * 14
+    cursor.x = firstTouch.clientX / sizes.width - 0.5
+    cursor.y = firstTouch.clientY / sizes.height - 0.5
+}, { passive: true })
+
+const releaseTouch = () =>
+{
+    touch.active = false
+}
+
+window.addEventListener('touchend', releaseTouch, { passive: true })
+window.addEventListener('touchcancel', releaseTouch, { passive: true })
 
 /**
  * Animate
@@ -189,12 +268,18 @@ const tick = () =>
     previousTime = elapsedTime
 
     // Animate camera
-    camera.position.y = - scrollY / sizes.height * objectsDistance
+    camera.position.y = - scrollY / getSectionHeight() * objectsDistance
 
     const parallaxX = cursor.x * 0.5
     const parallaxY = - cursor.y * 0.5
     cameraGroup.position.x += (parallaxX - cameraGroup.position.x) * 5 * deltaTime
     cameraGroup.position.y += (parallaxY - cameraGroup.position.y) * 5 * deltaTime
+
+    const activeMesh = getActiveMesh()
+    activeMesh.rotation.x += touch.rotationX * deltaTime * 8
+    activeMesh.rotation.y += touch.rotationY * deltaTime * 8
+    touch.rotationX *= 0.92
+    touch.rotationY *= 0.92
 
     // Animate meshes
     for(const mesh of sectionMeshes)
