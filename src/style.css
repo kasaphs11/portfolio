@@ -1,0 +1,67 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html
+{
+    background: #1e1a20;
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+}
+
+
+.section
+{
+    display: flex;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+    font-family: 'Cabin', sans-serif;
+    color: #ffeded;
+    text-transform: uppercase;
+    font-size: 7vmin;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.last-name
+{
+    margin-left: 0.5em;
+}
+
+.hero-title
+{
+    line-height: 0.9;
+}
+
+.hero-title span
+{
+    display: block;
+}
+
+.section-link
+{
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.section-link:hover
+{
+    opacity: 0.8;
+    transform: scale(1.02);
+}
+
+section:nth-child(odd)
+{
+    justify-content: flex-end;
+}
