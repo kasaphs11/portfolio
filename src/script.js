@@ -1,263 +1,166 @@
 import * as THREE from 'three'
-import gsap from 'gsap'
 
 const parameters = {
     materialColor: '#a600ff'
 }
 
-/**
- * Base
- */
-// Canvas
 const canvas = document.querySelector('canvas.webgl')
-const sections = Array.from(document.querySelectorAll('.section'))
-
-// Scene
 const scene = new THREE.Scene()
-
-/**
- * Objects
- */
-// Texture
-const textureLoader = new THREE.TextureLoader()
-const gradientTexture = textureLoader.load('textures/gradients/3.jpg')
-gradientTexture.magFilter = THREE.NearestFilter
-
-// Material
-const material = new THREE.MeshToonMaterial({
-    color: parameters.materialColor,
-    gradientMap: gradientTexture
-})
-
-// Objects
-const objectsDistance = 4
-const mesh1 = new THREE.Mesh(
-    new THREE.TorusGeometry(1, 0.4, 16, 60),
-    material
-)
-const mesh2 = new THREE.Mesh(
-    new THREE.ConeGeometry(1, 2, 32),
-    material
-)
-const mesh3 = new THREE.Mesh(
-    new THREE.TorusKnotGeometry(0.8, 0.35, 100, 16),
-    material
-)
-
-mesh1.position.x = 2
-mesh2.position.x = - 2
-mesh3.position.x = 2
-
-scene.add(mesh1, mesh2, mesh3)
-
-const sectionMeshes = [ mesh1, mesh2, mesh3 ]
-
-/**
- * Lights
- */
-const directionalLight = new THREE.DirectionalLight('#ffffff', 3)
-directionalLight.position.set(1, 1, 0)
-scene.add(directionalLight)
-
-/**
- * Particles
- */
-// Geometry
-const particlesCount = 200
-const positions = new Float32Array(particlesCount * 3)
-
-for(let i = 0; i < particlesCount; i++)
-{
-    positions[i * 3 + 0] = (Math.random() - 0.5) * 10
-    positions[i * 3 + 1] = objectsDistance * 0.5 - Math.random() * objectsDistance * sectionMeshes.length
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 10
-}
-
-const particlesGeometry = new THREE.BufferGeometry()
-particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-
-// Material
-const particlesMaterial = new THREE.PointsMaterial({
-    color: parameters.materialColor,
-    sizeAttenuation: true,
-    size: 0.03
-})
-
-// Points
-const particles = new THREE.Points(particlesGeometry, particlesMaterial)
-scene.add(particles)
-
-/**
- * Sizes
- */
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
 
-/**
- * Camera
- */
-// Group
+const textureLoader = new THREE.TextureLoader()
+const gradientTexture = textureLoader.load('textures/gradients/3.jpg')
+gradientTexture.magFilter = THREE.NearestFilter
+
+const shapeGroup = new THREE.Group()
+scene.add(shapeGroup)
+
+const material = new THREE.MeshToonMaterial({
+    color: parameters.materialColor,
+    gradientMap: gradientTexture
+})
+
+const mesh = new THREE.Mesh(
+    new THREE.TorusGeometry(1.35, 0.44, 22, 90),
+    material
+)
+shapeGroup.add(mesh)
+
+const ambientLight = new THREE.AmbientLight('#ffffff', 1.8)
+scene.add(ambientLight)
+
+const directionalLight = new THREE.DirectionalLight('#d9b3ff', 3.6)
+directionalLight.position.set(2, 2, 3)
+scene.add(directionalLight)
+
+const fillLight = new THREE.PointLight('#7b2dff', 18, 14)
+fillLight.position.set(-2.5, -1, 2.5)
+scene.add(fillLight)
+
+const particlesCount = 180
+const particlesGeometry = new THREE.BufferGeometry()
+const particlePositions = new Float32Array(particlesCount * 3)
+const particleSpeeds = new Float32Array(particlesCount)
+const particleDrift = new Float32Array(particlesCount)
+
+for(let i = 0; i < particlesCount; i++)
+{
+    particlePositions[i * 3] = (Math.random() - 0.5) * 12
+    particlePositions[i * 3 + 1] = (Math.random() - 0.5) * 11
+    particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 7 - 1.5
+    particleSpeeds[i] = 0.18 + Math.random() * 0.28
+    particleDrift[i] = Math.random() * Math.PI * 2
+}
+
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3))
+
+const particlesMaterial = new THREE.PointsMaterial({
+    color: '#e4d1ff',
+    size: 0.045,
+    sizeAttenuation: true,
+    transparent: true,
+    opacity: 0.65,
+    depthWrite: false
+})
+
+const particles = new THREE.Points(particlesGeometry, particlesMaterial)
+scene.add(particles)
+
 const cameraGroup = new THREE.Group()
 scene.add(cameraGroup)
 
-// Base camera
 const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 100)
-camera.position.z = 6
+camera.position.set(0, 0, 6)
 cameraGroup.add(camera)
-
-const getSectionHeight = () =>
-{
-    return sections[0]?.getBoundingClientRect().height || sizes.height
-}
 
 const updateLayout = () =>
 {
-    const isMobile = sizes.width <= 768
-    const horizontalOffset = isMobile ? 0.95 : 2
-    const verticalOffset = isMobile ? - 0.95 : 0
+    const isMobile = sizes.width <= 900
 
-    mesh1.position.x = horizontalOffset
-    mesh2.position.x = - horizontalOffset
-    mesh3.position.x = horizontalOffset
-
-    mesh1.position.y = - objectsDistance * 0 + verticalOffset
-    mesh2.position.y = - objectsDistance * 1 + verticalOffset
-    mesh3.position.y = - objectsDistance * 2 + verticalOffset
-
-    camera.position.z = isMobile ? 8.8 : 6
+    camera.position.z = isMobile ? 7.4 : 6
+    shapeGroup.position.x = isMobile ? 0 : 2.45
+    shapeGroup.position.y = isMobile ? 1.7 : 0.25
 }
 
 updateLayout()
 
-/**
- * Renderer
- */
 const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
-    alpha: true
+    alpha: true,
+    antialias: true
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 window.addEventListener('resize', () =>
 {
-    // Update sizes
     sizes.width = window.innerWidth
     sizes.height = window.innerHeight
+
     updateLayout()
 
-    // Update camera
     camera.aspect = sizes.width / sizes.height
     camera.updateProjectionMatrix()
 
-    // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
-/**
- * Scroll
- */
-let scrollY = window.scrollY
-let currentSection = 0
-
-window.addEventListener('scroll', () =>
-{
-    scrollY = window.scrollY
-    const newSection = Math.round(scrollY / getSectionHeight())
-
-    if(newSection != currentSection)
-    {
-        currentSection = newSection
-
-        gsap.to(
-            sectionMeshes[currentSection].rotation,
-            {
-                duration: 1.5,
-                ease: 'power2.inOut',
-                x: '+=6',
-                y: '+=3',
-                z: '+=1.5'
-            }
-        )
-    }
-})
-
-/**
- * Cursor
- */
-const cursor = {}
-cursor.x = 0
-cursor.y = 0
-
-const touch = {
-    active: false,
+const pointer = {
     x: 0,
-    y: 0,
+    y: 0
+}
+
+const target = {
     rotationX: 0,
-    rotationY: 0
+    rotationY: 0,
+    positionX: 0,
+    positionY: 0,
+    cameraX: 0,
+    cameraY: 0,
+    scale: 1
 }
 
-const getActiveMesh = () =>
+const resetInteraction = () =>
 {
-    return sectionMeshes[Math.min(currentSection, sectionMeshes.length - 1)]
+    pointer.x = 0
+    pointer.y = 0
+    target.rotationX = 0
+    target.rotationY = 0
+    target.positionX = 0
+    target.positionY = 0
+    target.cameraX = 0
+    target.cameraY = 0
+    target.scale = 1
 }
 
-window.addEventListener('mousemove', (event) =>
+const setPointer = (clientX, clientY) =>
 {
-    cursor.x = event.clientX / sizes.width - 0.5
-    cursor.y = event.clientY / sizes.height - 0.5
+    pointer.x = clientX / sizes.width - 0.5
+    pointer.y = clientY / sizes.height - 0.5
+
+    target.rotationY = pointer.x * 0.9
+    target.rotationX = pointer.y * 0.5
+    target.positionX = pointer.x * 0.18
+    target.positionY = - pointer.y * 0.14
+    target.cameraX = pointer.x * 0.05
+    target.cameraY = - pointer.y * 0.04
+    target.scale = 1 + Math.abs(pointer.x) * 0.015 + Math.abs(pointer.y) * 0.012
+}
+
+window.addEventListener('pointermove', (event) =>
+{
+    setPointer(event.clientX, event.clientY)
 })
 
-window.addEventListener('touchstart', (event) =>
+window.addEventListener('pointerleave', () =>
 {
-    const firstTouch = event.touches[0]
+    resetInteraction()
+})
 
-    if(! firstTouch)
-    {
-        return
-    }
-
-    touch.active = true
-    touch.x = firstTouch.clientX
-    touch.y = firstTouch.clientY
-    cursor.x = firstTouch.clientX / sizes.width - 0.5
-    cursor.y = firstTouch.clientY / sizes.height - 0.5
-}, { passive: true })
-
-window.addEventListener('touchmove', (event) =>
-{
-    const firstTouch = event.touches[0]
-
-    if(! touch.active || ! firstTouch)
-    {
-        return
-    }
-
-    const deltaX = (firstTouch.clientX - touch.x) / sizes.width
-    const deltaY = (firstTouch.clientY - touch.y) / sizes.height
-
-    touch.x = firstTouch.clientX
-    touch.y = firstTouch.clientY
-    touch.rotationY += deltaX * 14
-    touch.rotationX += deltaY * 14
-    cursor.x = firstTouch.clientX / sizes.width - 0.5
-    cursor.y = firstTouch.clientY / sizes.height - 0.5
-}, { passive: true })
-
-const releaseTouch = () =>
-{
-    touch.active = false
-}
-
-window.addEventListener('touchend', releaseTouch, { passive: true })
-window.addEventListener('touchcancel', releaseTouch, { passive: true })
-
-/**
- * Animate
- */
 const clock = new THREE.Clock()
 let previousTime = 0
 
@@ -267,31 +170,42 @@ const tick = () =>
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
 
-    // Animate camera
-    camera.position.y = - scrollY / getSectionHeight() * objectsDistance
+    mesh.rotation.x += ((0.72 + target.rotationX) - mesh.rotation.x) * 0.022
+    mesh.rotation.y += ((elapsedTime * 0.24 + target.rotationY) - mesh.rotation.y) * 0.022
+    mesh.rotation.z += 0.0015
 
-    const parallaxX = cursor.x * 0.5
-    const parallaxY = - cursor.y * 0.5
-    cameraGroup.position.x += (parallaxX - cameraGroup.position.x) * 5 * deltaTime
-    cameraGroup.position.y += (parallaxY - cameraGroup.position.y) * 5 * deltaTime
+    const baseX = sizes.width <= 900 ? 0 : 2.45
+    const baseY = sizes.width <= 900 ? 1.7 : 0.25
 
-    const activeMesh = getActiveMesh()
-    activeMesh.rotation.x += touch.rotationX * deltaTime * 8
-    activeMesh.rotation.y += touch.rotationY * deltaTime * 8
-    touch.rotationX *= 0.92
-    touch.rotationY *= 0.92
+    shapeGroup.position.x += ((baseX + target.positionX) - shapeGroup.position.x) * 0.03
+    shapeGroup.position.y += ((baseY + target.positionY + Math.sin(elapsedTime * 1.1) * 0.07) - shapeGroup.position.y) * 0.03
 
-    // Animate meshes
-    for(const mesh of sectionMeshes)
+    cameraGroup.position.x += (target.cameraX - cameraGroup.position.x) * 0.025
+    cameraGroup.position.y += (target.cameraY - cameraGroup.position.y) * 0.025
+
+    mesh.scale.x += (target.scale - mesh.scale.x) * 0.03
+    mesh.scale.y += (target.scale - mesh.scale.y) * 0.03
+    mesh.scale.z += (target.scale - mesh.scale.z) * 0.03
+
+    for(let i = 0; i < particlesCount; i++)
     {
-        mesh.rotation.x += deltaTime * 0.1
-        mesh.rotation.y += deltaTime * 0.12
+        const xIndex = i * 3
+        const yIndex = xIndex + 1
+
+        particlePositions[yIndex] -= particleSpeeds[i] * deltaTime
+        particlePositions[xIndex] += Math.sin(elapsedTime * 0.7 + particleDrift[i]) * 0.0008
+
+        if(particlePositions[yIndex] < -5.8)
+        {
+            particlePositions[yIndex] = 5.8
+            particlePositions[xIndex] = (Math.random() - 0.5) * 12
+        }
     }
 
-    // Render
-    renderer.render(scene, camera)
+    particlesGeometry.attributes.position.needsUpdate = true
+    particles.rotation.y = elapsedTime * 0.02
 
-    // Call tick again on the next frame
+    renderer.render(scene, camera)
     window.requestAnimationFrame(tick)
 }
 
