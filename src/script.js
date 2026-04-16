@@ -125,11 +125,11 @@ const getLayoutConfig = () =>
     if(isMobile)
     {
         return {
-            cameraZ: 8.15,
-            shapeX: 0.95,
-            shapeY: 2.15,
-            shapeScale: 0.78,
-            floatAmount: 0.05
+            cameraZ: 8.45,
+            shapeX: 0,
+            shapeY: 2.35,
+            shapeScale: 0.74,
+            floatAmount: 0.045
         }
     }
 
@@ -184,6 +184,8 @@ const pointer = {
     y: 0
 }
 
+let currentPointerType = 'mouse'
+
 const target = {
     rotationX: 0,
     rotationY: 0,
@@ -207,25 +209,77 @@ const resetInteraction = () =>
     target.scale = 1
 }
 
-const setPointer = (clientX, clientY) =>
+const getInteractionProfile = () =>
 {
-    const interactionStrength = sizes.width <= 900 ? 0.45 : 1
+    if(currentPointerType === 'touch')
+    {
+        return {
+            strength: 1,
+            rotationEase: 0.048,
+            positionEase: 0.058,
+            cameraEase: 0.042,
+            scaleEase: 0.05
+        }
+    }
+
+    if(sizes.width <= 900)
+    {
+        return {
+            strength: 0.6,
+            rotationEase: 0.026,
+            positionEase: 0.036,
+            cameraEase: 0.03,
+            scaleEase: 0.034
+        }
+    }
+
+    return {
+        strength: 1,
+        rotationEase: 0.022,
+        positionEase: 0.03,
+        cameraEase: 0.025,
+        scaleEase: 0.03
+    }
+}
+
+const setPointer = (clientX, clientY, pointerType = 'mouse') =>
+{
+    currentPointerType = pointerType || 'mouse'
+    const interactionProfile = getInteractionProfile()
 
     pointer.x = clientX / sizes.width - 0.5
     pointer.y = clientY / sizes.height - 0.5
 
-    target.rotationY = pointer.x * 0.9 * interactionStrength
-    target.rotationX = pointer.y * 0.5 * interactionStrength
-    target.positionX = pointer.x * 0.18 * interactionStrength
-    target.positionY = - pointer.y * 0.14 * interactionStrength
-    target.cameraX = pointer.x * 0.05 * interactionStrength
-    target.cameraY = - pointer.y * 0.04 * interactionStrength
-    target.scale = 1 + (Math.abs(pointer.x) * 0.015 + Math.abs(pointer.y) * 0.012) * interactionStrength
+    target.rotationY = pointer.x * 0.9 * interactionProfile.strength
+    target.rotationX = pointer.y * 0.5 * interactionProfile.strength
+    target.positionX = pointer.x * 0.18 * interactionProfile.strength
+    target.positionY = - pointer.y * 0.14 * interactionProfile.strength
+    target.cameraX = pointer.x * 0.05 * interactionProfile.strength
+    target.cameraY = - pointer.y * 0.04 * interactionProfile.strength
+    target.scale = 1 + (Math.abs(pointer.x) * 0.015 + Math.abs(pointer.y) * 0.012) * interactionProfile.strength
 }
+
+window.addEventListener('pointerdown', (event) =>
+{
+    setPointer(event.clientX, event.clientY, event.pointerType)
+})
 
 window.addEventListener('pointermove', (event) =>
 {
-    setPointer(event.clientX, event.clientY)
+    setPointer(event.clientX, event.clientY, event.pointerType)
+})
+
+window.addEventListener('pointerup', (event) =>
+{
+    if(event.pointerType === 'touch' || event.pointerType === 'pen')
+    {
+        resetInteraction()
+    }
+})
+
+window.addEventListener('pointercancel', () =>
+{
+    resetInteraction()
 })
 
 window.addEventListener('pointerleave', () =>
@@ -242,23 +296,24 @@ const tick = () =>
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
     const layout = getLayoutConfig()
+    const interactionProfile = getInteractionProfile()
 
-    mesh.rotation.x += ((0.72 + target.rotationX) - mesh.rotation.x) * 0.022
-    mesh.rotation.y += ((elapsedTime * 0.24 + target.rotationY) - mesh.rotation.y) * 0.022
+    mesh.rotation.x += ((0.72 + target.rotationX) - mesh.rotation.x) * interactionProfile.rotationEase
+    mesh.rotation.y += ((elapsedTime * 0.24 + target.rotationY) - mesh.rotation.y) * interactionProfile.rotationEase
     mesh.rotation.z += 0.0015
 
     const baseX = layout.shapeX
     const baseY = layout.shapeY
 
-    shapeGroup.position.x += ((baseX + target.positionX) - shapeGroup.position.x) * 0.03
-    shapeGroup.position.y += ((baseY + target.positionY + Math.sin(elapsedTime * 1.1) * layout.floatAmount) - shapeGroup.position.y) * 0.03
+    shapeGroup.position.x += ((baseX + target.positionX) - shapeGroup.position.x) * interactionProfile.positionEase
+    shapeGroup.position.y += ((baseY + target.positionY + Math.sin(elapsedTime * 1.1) * layout.floatAmount) - shapeGroup.position.y) * interactionProfile.positionEase
 
-    cameraGroup.position.x += (target.cameraX - cameraGroup.position.x) * 0.025
-    cameraGroup.position.y += (target.cameraY - cameraGroup.position.y) * 0.025
+    cameraGroup.position.x += (target.cameraX - cameraGroup.position.x) * interactionProfile.cameraEase
+    cameraGroup.position.y += (target.cameraY - cameraGroup.position.y) * interactionProfile.cameraEase
 
-    mesh.scale.x += (target.scale - mesh.scale.x) * 0.03
-    mesh.scale.y += (target.scale - mesh.scale.y) * 0.03
-    mesh.scale.z += (target.scale - mesh.scale.z) * 0.03
+    mesh.scale.x += (target.scale - mesh.scale.x) * interactionProfile.scaleEase
+    mesh.scale.y += (target.scale - mesh.scale.y) * interactionProfile.scaleEase
+    mesh.scale.z += (target.scale - mesh.scale.z) * interactionProfile.scaleEase
 
     for(let i = 0; i < particlesCount; i++)
     {

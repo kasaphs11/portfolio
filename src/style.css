@@ -344,10 +344,12 @@ body::after
 
     .hero-title
     {
-        max-width: 6.2ch;
+        max-width: none;
+        width: 100%;
         margin-top: 16px;
-        font-size: clamp(2.45rem, 12vw, 4.05rem);
+        font-size: clamp(2.2rem, 10.6vw, 3.6rem);
         line-height: 0.92;
+        letter-spacing: -0.045em;
     }
 
     .last-name
@@ -402,7 +404,8 @@ body::after
 
     .hero-title
     {
-        font-size: clamp(2.2rem, 12.5vw, 3.3rem);
+        font-size: clamp(2rem, 10.8vw, 3rem);
+        line-height: 0.94;
     }
 
     .hero-actions
