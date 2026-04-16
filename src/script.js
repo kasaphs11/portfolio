@@ -127,9 +127,9 @@ const getLayoutConfig = () =>
         return {
             cameraZ: 8.35,
             shapeX: 0,
-            shapeY: 0,
+            shapeY: -0.3,
             shapeScale: 0.74,
-            floatAmount: 0.045
+            floatAmount: 0.04
         }
     }
 
@@ -189,7 +189,16 @@ const touchDrag = {
     active: false,
     pointerId: null,
     startX: 0,
-    startY: 0
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+    velocityX: 0,
+    velocityY: 0
+}
+const touchSpin = {
+    x: 0,
+    y: 0,
+    z: 0
 }
 
 const target = {
@@ -213,6 +222,8 @@ const resetInteraction = () =>
     target.cameraX = 0
     target.cameraY = 0
     target.scale = 1
+    touchDrag.velocityX = 0
+    touchDrag.velocityY = 0
 }
 
 const getInteractionProfile = () =>
@@ -221,10 +232,10 @@ const getInteractionProfile = () =>
     {
         return {
             strength: 1,
-            rotationEase: 0.08,
-            positionEase: 0.09,
-            cameraEase: 0.065,
-            scaleEase: 0.075
+            rotationEase: 0.06,
+            positionEase: 0.07,
+            cameraEase: 0.052,
+            scaleEase: 0.06
         }
     }
 
@@ -269,21 +280,30 @@ const setTouchDrag = (clientX, clientY) =>
 {
     currentPointerType = 'touch'
 
-    const deltaX = (clientX - touchDrag.startX) / sizes.width
-    const deltaY = (clientY - touchDrag.startY) / sizes.height
-    const dragX = THREE.MathUtils.clamp(deltaX * 2.4, -0.55, 0.55)
-    const dragY = THREE.MathUtils.clamp(deltaY * 2.2, -0.5, 0.5)
+    const deltaX = (clientX - touchDrag.lastX) / sizes.width
+    const deltaY = (clientY - touchDrag.lastY) / sizes.height
+    const dragX = THREE.MathUtils.clamp((clientX - touchDrag.startX) / sizes.width * 1.25, -0.4, 0.4)
+    const dragY = THREE.MathUtils.clamp((clientY - touchDrag.startY) / sizes.height * 1.1, -0.32, 0.32)
+
+    touchDrag.lastX = clientX
+    touchDrag.lastY = clientY
+    touchDrag.velocityX = deltaX
+    touchDrag.velocityY = deltaY
 
     pointer.x = dragX
     pointer.y = dragY
 
-    target.rotationY = dragX * 1.55
-    target.rotationX = dragY * 1.05
-    target.positionX = dragX * 0.28
-    target.positionY = - dragY * 0.24
-    target.cameraX = dragX * 0.07
-    target.cameraY = - dragY * 0.055
-    target.scale = 1.015 + Math.min(Math.abs(dragX) + Math.abs(dragY), 0.75) * 0.045
+    target.rotationY = dragX * 0.38
+    target.rotationX = dragY * 0.26
+    target.positionX = dragX * 0.09
+    target.positionY = - dragY * 0.08
+    target.cameraX = dragX * 0.024
+    target.cameraY = - dragY * 0.02
+    target.scale = 1.01 + Math.min(Math.abs(dragX) + Math.abs(dragY), 0.6) * 0.025
+
+    touchSpin.x = THREE.MathUtils.clamp(touchSpin.x + deltaY * 4.2, -0.16, 0.16)
+    touchSpin.y = THREE.MathUtils.clamp(touchSpin.y + deltaX * 5.6, -0.24, 0.24)
+    touchSpin.z = THREE.MathUtils.clamp(touchSpin.z - deltaX * 3.8, -0.2, 0.2)
 }
 
 window.addEventListener('pointerdown', (event) =>
@@ -301,6 +321,8 @@ window.addEventListener('pointerdown', (event) =>
         touchDrag.pointerId = event.pointerId
         touchDrag.startX = event.clientX
         touchDrag.startY = event.clientY
+        touchDrag.lastX = event.clientX
+        touchDrag.lastY = event.clientY
         setTouchDrag(event.clientX, event.clientY)
         canvas.setPointerCapture(event.pointerId)
 
@@ -330,6 +352,9 @@ window.addEventListener('pointerup', (event) =>
             canvas.releasePointerCapture(event.pointerId)
         }
 
+        touchSpin.x = THREE.MathUtils.clamp(touchSpin.x + touchDrag.velocityY * 8.5, -0.24, 0.24)
+        touchSpin.y = THREE.MathUtils.clamp(touchSpin.y + touchDrag.velocityX * 11.5, -0.34, 0.34)
+        touchSpin.z = THREE.MathUtils.clamp(touchSpin.z - touchDrag.velocityX * 8.5, -0.28, 0.28)
         touchDrag.active = false
         touchDrag.pointerId = null
         resetInteraction()
@@ -364,6 +389,13 @@ const tick = () =>
     mesh.rotation.x += ((0.72 + target.rotationX) - mesh.rotation.x) * interactionProfile.rotationEase
     mesh.rotation.y += ((elapsedTime * 0.24 + target.rotationY) - mesh.rotation.y) * interactionProfile.rotationEase
     mesh.rotation.z += 0.0015
+    mesh.rotation.x += touchSpin.x
+    mesh.rotation.y += touchSpin.y
+    mesh.rotation.z += touchSpin.z
+
+    touchSpin.x *= 0.94
+    touchSpin.y *= 0.945
+    touchSpin.z *= 0.94
 
     const baseX = layout.shapeX
     const baseY = layout.shapeY
