@@ -127,7 +127,7 @@ const getLayoutConfig = () =>
         return {
             cameraZ: 8.35,
             shapeX: 0,
-            shapeY: 1.78,
+            shapeY: 1.50,
             shapeScale: 0.74,
             floatAmount: 0.045
         }
