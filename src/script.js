@@ -11,34 +11,76 @@ const sizes = {
     height: window.innerHeight
 }
 
-const textureLoader = new THREE.TextureLoader()
-const gradientTexture = textureLoader.load('textures/gradients/3.jpg')
-gradientTexture.magFilter = THREE.NearestFilter
-
 const shapeGroup = new THREE.Group()
 scene.add(shapeGroup)
 
-const material = new THREE.MeshToonMaterial({
+const torusGeometry = new THREE.TorusGeometry(1.35, 0.44, 40, 160)
+
+const material = new THREE.MeshPhysicalMaterial({
     color: parameters.materialColor,
-    gradientMap: gradientTexture
+    roughness: 0.18,
+    metalness: 0.08,
+    clearcoat: 1,
+    clearcoatRoughness: 0.06,
+    sheen: 1,
+    sheenColor: '#ffd9ff',
+    sheenRoughness: 0.36,
+    iridescence: 0.12,
+    iridescenceIOR: 1.28,
+    emissive: '#240030',
+    emissiveIntensity: 0.12
+})
+
+const innerMaterial = new THREE.MeshPhysicalMaterial({
+    color: '#f2c7ff',
+    transparent: true,
+    opacity: 0.16,
+    roughness: 0.08,
+    metalness: 0,
+    clearcoat: 1,
+    clearcoatRoughness: 0.02,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+})
+
+const glowMaterial = new THREE.MeshBasicMaterial({
+    color: '#bb59ff',
+    transparent: true,
+    opacity: 0.08,
+    side: THREE.BackSide,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
 })
 
 const mesh = new THREE.Mesh(
-    new THREE.TorusGeometry(1.35, 0.44, 22, 90),
+    torusGeometry,
     material
 )
+const innerMesh = new THREE.Mesh(torusGeometry, innerMaterial)
+innerMesh.scale.setScalar(0.985)
+const glowMesh = new THREE.Mesh(torusGeometry, glowMaterial)
+glowMesh.scale.setScalar(1.06)
+
+mesh.add(innerMesh, glowMesh)
 shapeGroup.add(mesh)
 
-const ambientLight = new THREE.AmbientLight('#ffffff', 1.8)
+const hemisphereLight = new THREE.HemisphereLight('#f2d2ff', '#150e21', 2.4)
+scene.add(hemisphereLight)
+
+const ambientLight = new THREE.AmbientLight('#ffffff', 0.55)
 scene.add(ambientLight)
 
-const directionalLight = new THREE.DirectionalLight('#d9b3ff', 3.6)
-directionalLight.position.set(2, 2, 3)
+const directionalLight = new THREE.DirectionalLight('#f6d2ff', 2.8)
+directionalLight.position.set(2.6, 2.2, 3.4)
 scene.add(directionalLight)
 
-const fillLight = new THREE.PointLight('#7b2dff', 18, 14)
-fillLight.position.set(-2.5, -1, 2.5)
+const fillLight = new THREE.PointLight('#7b2dff', 22, 16)
+fillLight.position.set(-2.2, -0.8, 2.7)
 scene.add(fillLight)
+
+const rimLight = new THREE.DirectionalLight('#9d4dff', 1.8)
+rimLight.position.set(-3.8, 1.4, 2.8)
+scene.add(rimLight)
 
 const particlesCount = 180
 const particlesGeometry = new THREE.BufferGeometry()
@@ -81,8 +123,9 @@ const updateLayout = () =>
     const isMobile = sizes.width <= 900
 
     camera.position.z = isMobile ? 7.4 : 6
-    shapeGroup.position.x = isMobile ? 0 : 2.45
-    shapeGroup.position.y = isMobile ? 1.7 : 0.25
+    shapeGroup.position.x = isMobile ? 0 : 2.25
+    shapeGroup.position.y = isMobile ? 1.55 : 0.22
+    shapeGroup.scale.setScalar(isMobile ? 0.9 : 0.96)
 }
 
 updateLayout()
@@ -94,6 +137,9 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.outputColorSpace = THREE.SRGBColorSpace
+renderer.toneMapping = THREE.ACESFilmicToneMapping
+renderer.toneMappingExposure = 1.12
 
 window.addEventListener('resize', () =>
 {
@@ -174,8 +220,8 @@ const tick = () =>
     mesh.rotation.y += ((elapsedTime * 0.24 + target.rotationY) - mesh.rotation.y) * 0.022
     mesh.rotation.z += 0.0015
 
-    const baseX = sizes.width <= 900 ? 0 : 2.45
-    const baseY = sizes.width <= 900 ? 1.7 : 0.25
+    const baseX = sizes.width <= 900 ? 0 : 2.25
+    const baseY = sizes.width <= 900 ? 1.55 : 0.22
 
     shapeGroup.position.x += ((baseX + target.positionX) - shapeGroup.position.x) * 0.03
     shapeGroup.position.y += ((baseY + target.positionY + Math.sin(elapsedTime * 1.1) * 0.07) - shapeGroup.position.y) * 0.03

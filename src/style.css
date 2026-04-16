@@ -8,6 +8,7 @@
     --purple-soft: #c873ff;
     --purple-glow: rgba(166, 0, 255, 0.24);
     --text: #f5edff;
+    --muted: rgba(233, 223, 247, 0.72);
     --stroke: rgba(255, 255, 255, 0.16);
     --shadow: 0 38px 110px rgba(0, 0, 0, 0.42);
 }
@@ -65,7 +66,10 @@ body::before
 
 body::after
 {
-    background: radial-gradient(circle at center, transparent 0%, rgba(7, 4, 10, 0.1) 48%, rgba(7, 4, 10, 0.55) 100%);
+    background:
+        radial-gradient(circle at 78% 22%, rgba(166, 0, 255, 0.12), transparent 18%),
+        radial-gradient(circle at 52% 82%, rgba(102, 36, 179, 0.14), transparent 28%),
+        radial-gradient(circle at center, transparent 0%, rgba(7, 4, 10, 0.1) 48%, rgba(7, 4, 10, 0.55) 100%);
 }
 
 .webgl
@@ -92,15 +96,15 @@ body::after
 .hero-panel
 {
     position: relative;
-    width: min(100%, 680px);
-    padding: clamp(30px, 4vw, 46px);
+    width: min(100%, 700px);
+    padding: clamp(30px, 4vw, 48px);
     border: 1px solid transparent;
     border-radius: 34px;
     background:
-        linear-gradient(180deg, rgba(41, 29, 54, 0.88) 0%, rgba(20, 14, 31, 0.8) 100%) padding-box,
+        linear-gradient(180deg, rgba(43, 31, 58, 0.9) 0%, rgba(19, 14, 29, 0.84) 100%) padding-box,
         linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04), rgba(168, 102, 255, 0.28)) border-box;
     box-shadow: var(--shadow);
-    backdrop-filter: blur(18px);
+    backdrop-filter: blur(22px);
     overflow: hidden;
 }
 
@@ -132,15 +136,40 @@ body::after
     animation: orbFloat 8s ease-in-out infinite;
 }
 
-.hero-title
+.hero-panel > *
 {
     position: relative;
     z-index: 1;
+}
+
+.hero-kicker
+{
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(232, 207, 255, 0.84);
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+}
+
+.hero-kicker::before
+{
+    content: '';
+    width: 42px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(232, 207, 255, 0.92), transparent);
+}
+
+.hero-title
+{
     font-family: 'Syne', sans-serif;
     max-width: 8.4ch;
-    font-size: clamp(3.1rem, 9vw, 5.8rem);
+    margin-top: 18px;
+    font-size: clamp(3rem, 8.2vw, 5.3rem);
     line-height: 0.9;
-    letter-spacing: -0.05em;
+    letter-spacing: -0.055em;
     text-transform: uppercase;
     text-wrap: balance;
     color: #f5edff;
@@ -162,10 +191,17 @@ body::after
     opacity: 0.92;
 }
 
+.hero-subtitle
+{
+    max-width: 33rem;
+    margin-top: 18px;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.65;
+}
+
 .hero-actions
 {
-    position: relative;
-    z-index: 1;
     display: flex;
     flex-wrap: wrap;
     gap: 14px;
@@ -177,6 +213,8 @@ body::after
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
     min-height: 54px;
     padding: 0 26px;
     border-radius: 999px;
@@ -195,11 +233,26 @@ body::after
         opacity 0.24s ease;
 }
 
+.section-link::before
+{
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.28) 50%, transparent 78%);
+    transform: translateX(-140%);
+    transition: transform 0.55s ease;
+}
+
 .section-link:hover
 {
     transform: translateY(-2px);
     box-shadow: 0 16px 42px rgba(0, 0, 0, 0.28);
     border-color: rgba(255, 255, 255, 0.24);
+}
+
+.section-link:hover::before
+{
+    transform: translateX(140%);
 }
 
 .primary-link
@@ -217,6 +270,12 @@ body::after
 .ghost-link:hover
 {
     background: rgba(255, 255, 255, 0.07);
+}
+
+.section-link:focus-visible
+{
+    outline: 2px solid rgba(230, 198, 255, 0.9);
+    outline-offset: 3px;
 }
 
 @keyframes orbFloat
@@ -251,12 +310,18 @@ body::after
     .hero-title
     {
         max-width: none;
-        font-size: clamp(2.9rem, 14vw, 4.9rem);
+        font-size: clamp(2.9rem, 14vw, 4.7rem);
     }
 
     .last-name
     {
         margin-left: 0;
+    }
+
+    .hero-subtitle
+    {
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .hero-actions
@@ -288,6 +353,18 @@ body::after
     {
         flex-direction: column;
         margin-top: 28px;
+    }
+
+    .hero-kicker
+    {
+        font-size: 0.68rem;
+        letter-spacing: 0.18em;
+    }
+
+    .hero-subtitle
+    {
+        font-size: 0.94rem;
+        line-height: 1.58;
     }
 
     .section-link
