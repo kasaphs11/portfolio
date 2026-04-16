@@ -118,14 +118,38 @@ const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 
 camera.position.set(0, 0, 6)
 cameraGroup.add(camera)
 
-const updateLayout = () =>
+const getLayoutConfig = () =>
 {
     const isMobile = sizes.width <= 900
 
-    camera.position.z = isMobile ? 7.4 : 6
-    shapeGroup.position.x = isMobile ? 0 : 2.25
-    shapeGroup.position.y = isMobile ? 1.55 : 0.22
-    shapeGroup.scale.setScalar(isMobile ? 0.9 : 0.96)
+    if(isMobile)
+    {
+        return {
+            cameraZ: 8.15,
+            shapeX: 0.95,
+            shapeY: 2.15,
+            shapeScale: 0.78,
+            floatAmount: 0.05
+        }
+    }
+
+    return {
+        cameraZ: 6,
+        shapeX: 2.25,
+        shapeY: 0.22,
+        shapeScale: 0.96,
+        floatAmount: 0.07
+    }
+}
+
+const updateLayout = () =>
+{
+    const layout = getLayoutConfig()
+
+    camera.position.z = layout.cameraZ
+    shapeGroup.position.x = layout.shapeX
+    shapeGroup.position.y = layout.shapeY
+    shapeGroup.scale.setScalar(layout.shapeScale)
 }
 
 updateLayout()
@@ -185,16 +209,18 @@ const resetInteraction = () =>
 
 const setPointer = (clientX, clientY) =>
 {
+    const interactionStrength = sizes.width <= 900 ? 0.45 : 1
+
     pointer.x = clientX / sizes.width - 0.5
     pointer.y = clientY / sizes.height - 0.5
 
-    target.rotationY = pointer.x * 0.9
-    target.rotationX = pointer.y * 0.5
-    target.positionX = pointer.x * 0.18
-    target.positionY = - pointer.y * 0.14
-    target.cameraX = pointer.x * 0.05
-    target.cameraY = - pointer.y * 0.04
-    target.scale = 1 + Math.abs(pointer.x) * 0.015 + Math.abs(pointer.y) * 0.012
+    target.rotationY = pointer.x * 0.9 * interactionStrength
+    target.rotationX = pointer.y * 0.5 * interactionStrength
+    target.positionX = pointer.x * 0.18 * interactionStrength
+    target.positionY = - pointer.y * 0.14 * interactionStrength
+    target.cameraX = pointer.x * 0.05 * interactionStrength
+    target.cameraY = - pointer.y * 0.04 * interactionStrength
+    target.scale = 1 + (Math.abs(pointer.x) * 0.015 + Math.abs(pointer.y) * 0.012) * interactionStrength
 }
 
 window.addEventListener('pointermove', (event) =>
@@ -215,16 +241,17 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
+    const layout = getLayoutConfig()
 
     mesh.rotation.x += ((0.72 + target.rotationX) - mesh.rotation.x) * 0.022
     mesh.rotation.y += ((elapsedTime * 0.24 + target.rotationY) - mesh.rotation.y) * 0.022
     mesh.rotation.z += 0.0015
 
-    const baseX = sizes.width <= 900 ? 0 : 2.25
-    const baseY = sizes.width <= 900 ? 1.55 : 0.22
+    const baseX = layout.shapeX
+    const baseY = layout.shapeY
 
     shapeGroup.position.x += ((baseX + target.positionX) - shapeGroup.position.x) * 0.03
-    shapeGroup.position.y += ((baseY + target.positionY + Math.sin(elapsedTime * 1.1) * 0.07) - shapeGroup.position.y) * 0.03
+    shapeGroup.position.y += ((baseY + target.positionY + Math.sin(elapsedTime * 1.1) * layout.floatAmount) - shapeGroup.position.y) * 0.03
 
     cameraGroup.position.x += (target.cameraX - cameraGroup.position.x) * 0.025
     cameraGroup.position.y += (target.cameraY - cameraGroup.position.y) * 0.025
