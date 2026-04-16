@@ -125,9 +125,9 @@ const getLayoutConfig = () =>
     if(isMobile)
     {
         return {
-            cameraZ: 8.45,
+            cameraZ: 8.35,
             shapeX: 0,
-            shapeY: 2.35,
+            shapeY: 1.78,
             shapeScale: 0.74,
             floatAmount: 0.045
         }
@@ -185,6 +185,12 @@ const pointer = {
 }
 
 let currentPointerType = 'mouse'
+const touchDrag = {
+    active: false,
+    pointerId: null,
+    startX: 0,
+    startY: 0
+}
 
 const target = {
     rotationX: 0,
@@ -211,14 +217,14 @@ const resetInteraction = () =>
 
 const getInteractionProfile = () =>
 {
-    if(currentPointerType === 'touch')
+    if(currentPointerType === 'touch' && touchDrag.active)
     {
         return {
             strength: 1,
-            rotationEase: 0.048,
-            positionEase: 0.058,
-            cameraEase: 0.042,
-            scaleEase: 0.05
+            rotationEase: 0.08,
+            positionEase: 0.09,
+            cameraEase: 0.065,
+            scaleEase: 0.075
         }
     }
 
@@ -259,13 +265,59 @@ const setPointer = (clientX, clientY, pointerType = 'mouse') =>
     target.scale = 1 + (Math.abs(pointer.x) * 0.015 + Math.abs(pointer.y) * 0.012) * interactionProfile.strength
 }
 
+const setTouchDrag = (clientX, clientY) =>
+{
+    currentPointerType = 'touch'
+
+    const deltaX = (clientX - touchDrag.startX) / sizes.width
+    const deltaY = (clientY - touchDrag.startY) / sizes.height
+    const dragX = THREE.MathUtils.clamp(deltaX * 2.4, -0.55, 0.55)
+    const dragY = THREE.MathUtils.clamp(deltaY * 2.2, -0.5, 0.5)
+
+    pointer.x = dragX
+    pointer.y = dragY
+
+    target.rotationY = dragX * 1.55
+    target.rotationX = dragY * 1.05
+    target.positionX = dragX * 0.28
+    target.positionY = - dragY * 0.24
+    target.cameraX = dragX * 0.07
+    target.cameraY = - dragY * 0.055
+    target.scale = 1.015 + Math.min(Math.abs(dragX) + Math.abs(dragY), 0.75) * 0.045
+}
+
 window.addEventListener('pointerdown', (event) =>
 {
+    const clickedInteractiveElement = event.target instanceof Element && event.target.closest('a, button')
+
+    if(clickedInteractiveElement)
+    {
+        return
+    }
+
+    if(event.pointerType === 'touch' || event.pointerType === 'pen')
+    {
+        touchDrag.active = true
+        touchDrag.pointerId = event.pointerId
+        touchDrag.startX = event.clientX
+        touchDrag.startY = event.clientY
+        setTouchDrag(event.clientX, event.clientY)
+        canvas.setPointerCapture(event.pointerId)
+
+        return
+    }
+
     setPointer(event.clientX, event.clientY, event.pointerType)
 })
 
 window.addEventListener('pointermove', (event) =>
 {
+    if(touchDrag.active && event.pointerId === touchDrag.pointerId)
+    {
+        setTouchDrag(event.clientX, event.clientY)
+        return
+    }
+
     setPointer(event.clientX, event.clientY, event.pointerType)
 })
 
@@ -273,17 +325,28 @@ window.addEventListener('pointerup', (event) =>
 {
     if(event.pointerType === 'touch' || event.pointerType === 'pen')
     {
+        if(touchDrag.active && event.pointerId === touchDrag.pointerId && canvas.hasPointerCapture(event.pointerId))
+        {
+            canvas.releasePointerCapture(event.pointerId)
+        }
+
+        touchDrag.active = false
+        touchDrag.pointerId = null
         resetInteraction()
     }
 })
 
 window.addEventListener('pointercancel', () =>
 {
+    touchDrag.active = false
+    touchDrag.pointerId = null
     resetInteraction()
 })
 
 window.addEventListener('pointerleave', () =>
 {
+    touchDrag.active = false
+    touchDrag.pointerId = null
     resetInteraction()
 })
 
