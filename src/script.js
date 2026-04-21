@@ -281,7 +281,16 @@ const openMuseumImageLightbox = (trigger) =>
     museumLightboxImage.src = sourceImage.currentSrc || sourceImage.src
     museumLightboxImage.alt = sourceImage.alt
     museumLightboxImage.hidden = false
-    museumLightboxVideo?.setAttribute('hidden', '')
+
+    if(museumLightboxVideo)
+    {
+        museumLightboxVideo.pause()
+        museumLightboxVideo.hidden = true
+        museumLightboxVideo.removeAttribute('src')
+        museumLightboxVideo.removeAttribute('poster')
+        museumLightboxVideo.load()
+    }
+
     museumLightbox.hidden = false
     museumLightbox.setAttribute('aria-hidden', 'false')
     document.body.classList.add('museum-lightbox-open')

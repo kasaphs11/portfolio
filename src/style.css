@@ -975,6 +975,12 @@ body.museum-lightbox-open
     background: #080510;
 }
 
+.museum-lightbox-image[hidden],
+.museum-lightbox-video[hidden]
+{
+    display: none !important;
+}
+
 .museum-lightbox-close
 {
     position: absolute;
