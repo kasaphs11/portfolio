@@ -450,6 +450,35 @@ body::after
     overflow: hidden;
 }
 
+.mobile-degree-card
+{
+    display: none;
+}
+
+.mobile-degree-shell
+{
+    margin-top: 16px;
+    padding: 14px;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        0 12px 24px rgba(0, 0, 0, 0.16);
+}
+
+.mobile-degree-image
+{
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 520px;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 18px 28px rgba(0, 0, 0, 0.22);
+}
+
 .credential-highlight::before,
 .credential-card::before,
 .media-card::before
@@ -1095,6 +1124,12 @@ body.museum-lightbox-open
     {
         margin-top: 26px;
         padding: 22px;
+    }
+
+    .mobile-degree-card
+    {
+        display: block;
+        margin-top: 26px;
     }
 
     .certificate-preview-shell

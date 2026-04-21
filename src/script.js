@@ -13,6 +13,7 @@ const certificateTags = document.querySelector('[data-cert-tags]')
 const certificateCounter = document.querySelector('[data-cert-counter]')
 const certificateStatus = document.querySelector('.certificate-status')
 const certificateImage = document.querySelector('[data-cert-image]')
+const mobileDegreeImage = document.querySelector('[data-mobile-degree-image]')
 const certificatePrev = document.querySelector('[data-cert-prev]')
 const certificateNext = document.querySelector('[data-cert-next]')
 const museumImageMain = document.querySelector('[data-museum-image-main]')
@@ -106,6 +107,12 @@ const certificates = [
 
 let currentCertificateIndex = 0
 let activeMuseumTrigger = null
+
+if(mobileDegreeImage)
+{
+    mobileDegreeImage.src = diplomaImage
+    mobileDegreeImage.alt = 'Degree diploma preview'
+}
 
 const museumImageModules = import.meta.glob('../museum/*.{jpg,jpeg,png,webp}', {
     eager: true,
