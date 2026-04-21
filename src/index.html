@@ -9,33 +9,196 @@
 <body>
     <canvas class="webgl"></canvas>
 
-    <section class="hero">
-        <div class="hero-panel">
-            <p class="hero-kicker">Interactive Frontend Portfolio</p>
-            <h1 class="hero-title">
-                <span>Stefanos</span>
-                <span class="last-name">Kasapis</span>
-            </h1>
-            <div class="hero-actions">
-                <a
-                    class="section-link primary-link"
-                    href="https://github.com/kasaphs11"
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    Projects
-                </a>
-                <a
-                    class="section-link ghost-link"
-                    href="https://www.linkedin.com/in/stefanos-kasapis-369ab2221"
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    Contact me
-                </a>
+    <header class="site-nav">
+        <a class="brand-mark" href="#home" data-scroll-link>SK</a>
+
+        <nav class="page-nav" aria-label="Portfolio sections">
+            <a class="page-link is-active" href="#home" data-scroll-link data-section="home">Intro</a>
+            <a class="page-link" href="#credentials" data-scroll-link data-section="credentials">Degree &amp; Certifications</a>
+            <a class="page-link" href="#museum" data-scroll-link data-section="museum">Museum Project</a>
+        </nav>
+    </header>
+
+    <main class="page-shell">
+        <section class="panel-section hero" id="home" data-section="home">
+            <div class="section-card hero-panel">
+                <p class="section-kicker hero-kicker">Interactive Frontend Portfolio</p>
+                <h1 class="hero-title">
+                    <span>Stefanos</span>
+                    <span class="last-name">Kasapis</span>
+                </h1>
+                <div class="hero-actions">
+                    <a
+                        class="section-link primary-link"
+                        href="https://github.com/kasaphs11"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        Projects
+                    </a>
+                    <a
+                        class="section-link ghost-link"
+                        href="https://www.linkedin.com/in/stefanos-kasapis-369ab2221"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        Contact me
+                    </a>
+                </div>
             </div>
+        </section>
+
+        <section class="panel-section section-credentials" id="credentials" data-section="credentials">
+            <div class="section-card info-panel">
+                <div class="section-copy">
+                    <p class="section-kicker">Academic Profile</p>
+                    <h2 class="section-title">Degree &amp; Certifications</h2>
+                </div>
+
+                <article class="certificate-viewer" aria-live="polite">
+                    <div class="certificate-topline">
+                        <span class="card-label certificate-status">Certificate 01</span>
+                        <span class="certificate-counter" data-cert-counter>01 / 09</span>
+                    </div>
+
+                    <div class="certificate-preview-row">
+                        <button class="certificate-arrow certificate-arrow-side" type="button" data-cert-prev aria-label="Previous certificate">&lt;</button>
+                        <div class="certificate-preview-shell">
+                            <img
+                                class="certificate-preview-image"
+                                data-cert-image
+                                alt="Certificate preview"
+                                loading="lazy"
+                            >
+                        </div>
+                        <button class="certificate-arrow certificate-arrow-side" type="button" data-cert-next aria-label="Next certificate">&gt;</button>
+                    </div>
+
+                    <div class="certificate-content">
+                        <h3 class="card-title" data-cert-title>Certificate Image</h3>
+                        <p class="certificate-meta" data-cert-issuer>Certificate archive image</p>
+                        <p class="card-description" data-cert-description>
+                            Browse through the real certificate images that you added in the certificates folder.
+                        </p>
+                        <div class="credential-tags" data-cert-tags>
+                            <span>Certificate</span>
+                            <span>Image</span>
+                            <span>Archive</span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel-section section-museum" id="museum" data-section="museum">
+            <div class="section-card gallery-panel">
+                <div class="section-copy">
+                    <p class="section-kicker">Museum Feature</p>
+                    <h2 class="section-title">Project In The Museum</h2>
+                    <p class="section-description">
+                        Two projects created in collaboration with Professor Ioannis Fountos are featured inside
+                        GENERAL ARCHIVES OF GREECE - HISTORICAL ARCHIVES - MUSEUM OF EPIRUS and form an active part
+                        of the museum itself.
+                    </p>
+                    <a
+                        class="museum-map-link"
+                        href="https://www.google.com/maps/search/?api=1&query=%CE%93.%CE%91.%CE%9A.%20-%20%CE%99%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CF%8C%20%CE%91%CF%81%CF%87%CE%B5%CE%AF%CE%BF%20%CE%9C%CE%BF%CF%85%CF%83%CE%B5%CE%AF%CE%BF%20%CE%97%CF%80%CE%B5%CE%AF%CF%81%CE%BF%CF%85%2C%20%CE%91%CF%81%CF%87%CE%B5%CE%AF%CE%BF%CF%85%20%CF%84%CE%BF%CF%85%20%CE%9A%CF%81%CE%AC%CF%84%CE%BF%CF%85%CF%82%2C%20%CE%A3%CE%BF%CF%85%CF%86%CE%B1%CF%81%CE%AF%20%CE%A3%CE%B1%CF%81%CE%AC%CE%B9%2C%20%CE%9A%CE%AC%CF%83%CF%84%CF%81%CE%BF%2C%20%CE%94.%20%CE%A6%CE%B9%CE%BB%CE%BF%CF%83%CF%8C%CF%86%CE%BF%CF%85%20%CE%BA%CE%B1%CE%B9%20%CE%93%CE%BB%CF%85%CE%BA%CE%AF%CE%B4%CF%89%CE%BD%201%2C%20%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B9%CE%BD%CE%B1%20452%2021"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        Soufari Sarai, Kastro, D. Filosofou &amp; Glykiton 1, Ioannina 452 21
+                    </a>
+                </div>
+
+                <div class="media-layout">
+                    <article class="media-card media-feature">
+                        <span class="card-label">Museum Exhibit</span>
+                        <div class="museum-image-shell museum-media-shell museum-feature-shell">
+                            <button class="museum-image-trigger" type="button" data-museum-lightbox-trigger>
+                                <img
+                                    class="museum-image museum-image-main"
+                                    data-museum-image-main
+                                    alt="Museum exhibit preview"
+                                    loading="lazy"
+                                />
+                            </button>
+                        </div>
+                    </article>
+
+                    <div class="media-stack">
+                        <article class="media-card">
+                            <span class="card-label">Lake Photo</span>
+                            <div class="museum-image-shell museum-media-shell">
+                                <button class="museum-image-trigger" type="button" data-museum-lightbox-trigger>
+                                    <img
+                                        class="museum-image"
+                                        data-museum-image-lake
+                                        alt="Lake museum project photo"
+                                        loading="lazy"
+                                    />
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="media-card">
+                            <span class="card-label">Quiz Photo</span>
+                            <div class="museum-image-shell museum-media-shell">
+                                <button class="museum-image-trigger" type="button" data-museum-lightbox-trigger>
+                                    <img
+                                        class="museum-image"
+                                        data-museum-image-quiz
+                                        alt="Quiz museum project photo"
+                                        loading="lazy"
+                                    />
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="media-card">
+                            <span class="card-label">Lake Video</span>
+                            <div class="museum-video-shell museum-video-shell-compact museum-media-shell">
+                                <button class="museum-video-trigger" type="button" data-museum-video-lightbox-trigger="lake" aria-label="Play Lake video">
+                                    <img
+                                        class="museum-video-poster"
+                                        data-museum-video-poster-lake
+                                        alt="Lake video preview"
+                                        loading="lazy"
+                                    />
+                                    <span class="museum-video-play" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </article>
+
+                        <article class="media-card">
+                            <span class="card-label">Quiz Video</span>
+                            <div class="museum-video-shell museum-video-shell-compact museum-media-shell">
+                                <button class="museum-video-trigger" type="button" data-museum-video-lightbox-trigger="quiz" aria-label="Play Quiz video">
+                                    <img
+                                        class="museum-video-poster"
+                                        data-museum-video-poster-quiz
+                                        alt="Quiz video preview"
+                                        loading="lazy"
+                                    />
+                                    <span class="museum-video-play" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="museum-lightbox" data-museum-lightbox hidden aria-hidden="true">
+        <button class="museum-lightbox-backdrop" type="button" data-museum-lightbox-close aria-label="Close fullscreen preview"></button>
+        <div class="museum-lightbox-dialog" role="dialog" aria-modal="true" aria-label="Museum media preview">
+            <button class="museum-lightbox-close" type="button" data-museum-lightbox-close aria-label="Close preview">
+                Close
+            </button>
+            <img class="museum-lightbox-image" data-museum-lightbox-image alt="" />
+            <video class="museum-lightbox-video" data-museum-lightbox-video controls playsinline hidden></video>
         </div>
-    </section>
+    </div>
 
     <script type="module" src="./script.js"></script>
 </body>
