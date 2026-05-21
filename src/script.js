@@ -107,6 +107,7 @@ const certificates = [
 
 let currentCertificateIndex = 0
 let activeMuseumTrigger = null
+const certificateImagePreloadCache = new Map()
 
 if(mobileDegreeImage)
 {
@@ -496,6 +497,91 @@ const certificateSlides = (() =>
     })
 })()
 
+const preloadCertificateImage = (url, priority = 'auto') =>
+{
+    if(!url)
+    {
+        return Promise.resolve(null)
+    }
+
+    const cachedPromise = certificateImagePreloadCache.get(url)
+
+    if(cachedPromise)
+    {
+        return cachedPromise
+    }
+
+    const preloader = new Image()
+    preloader.decoding = 'async'
+
+    if('fetchPriority' in preloader)
+    {
+        preloader.fetchPriority = priority
+    }
+
+    const preloadPromise = new Promise((resolve) =>
+    {
+        const finalize = (result) =>
+        {
+            preloader.removeEventListener('load', handleLoad)
+            preloader.removeEventListener('error', handleError)
+            resolve(result)
+        }
+
+        const handleLoad = () => finalize(preloader)
+        const handleError = () => finalize(null)
+
+        preloader.addEventListener('load', handleLoad, { once: true })
+        preloader.addEventListener('error', handleError, { once: true })
+        preloader.src = url
+
+        if(preloader.complete)
+        {
+            finalize(preloader.naturalWidth > 0 ? preloader : null)
+        }
+    })
+
+    certificateImagePreloadCache.set(url, preloadPromise)
+
+    return preloadPromise
+}
+
+const preloadCertificateNeighbors = (index) =>
+{
+    if(certificateSlides.length <= 1)
+    {
+        return
+    }
+
+    const previousIndex = (index - 1 + certificateSlides.length) % certificateSlides.length
+    const nextIndex = (index + 1) % certificateSlides.length
+
+    preloadCertificateImage(certificateSlides[previousIndex]?.image, 'high')
+    preloadCertificateImage(certificateSlides[nextIndex]?.image, 'high')
+}
+
+const preloadCertificateGallery = () =>
+{
+    certificateSlides.forEach((slide, index) =>
+    {
+        const priority = index < 3 ? 'high' : 'low'
+        preloadCertificateImage(slide.image, priority)
+    })
+}
+
+const scheduleCertificateGalleryPreload = () =>
+{
+    const runPreload = () => preloadCertificateGallery()
+
+    if(typeof window !== 'undefined' && 'requestIdleCallback' in window)
+    {
+        window.requestIdleCallback(runPreload, { timeout: 1500 })
+        return
+    }
+
+    window.setTimeout(runPreload, 250)
+}
+
 const renderCertificate = () =>
 {
     const certificate = certificateSlides[currentCertificateIndex]
@@ -512,6 +598,8 @@ const renderCertificate = () =>
     certificateCounter.textContent = `${String(currentCertificateIndex + 1).padStart(2, '0')} / ${String(certificateSlides.length).padStart(2, '0')}`
     certificateImage.src = certificate.image
     certificateImage.alt = certificate.alt
+    preloadCertificateImage(certificate.image, 'high')
+    preloadCertificateNeighbors(currentCertificateIndex)
     certificateTags.replaceChildren(
         ...certificate.tags.map((tag) =>
         {
@@ -575,6 +663,7 @@ window.addEventListener('keydown', (event) =>
 
 renderCertificate()
 renderMuseumMedia()
+scheduleCertificateGalleryPreload()
 
 const scene = new THREE.Scene()
 const sizes = {
@@ -1446,3 +1535,4 @@ const tick = () =>
 }
 
 tick()
+
