@@ -5,6 +5,10 @@ const canvas = document.querySelector('canvas.webgl')
 const sections = [...document.querySelectorAll('.panel-section')]
 const pageLinks = [...document.querySelectorAll('.page-link')]
 const scrollLinks = [...document.querySelectorAll('[data-scroll-link]')]
+const siteLoader = document.querySelector('[data-site-loader]')
+const siteLoaderLabel = document.querySelector('[data-site-loader-label]')
+const siteLoaderValue = document.querySelector('[data-site-loader-value]')
+const siteLoaderProgress = document.querySelector('[data-site-loader-progress]')
 
 const certificateTitle = document.querySelector('[data-cert-title]')
 const certificateIssuer = document.querySelector('[data-cert-issuer]')
@@ -108,6 +112,8 @@ const certificates = [
 let currentCertificateIndex = 0
 let activeMuseumTrigger = null
 const certificateImagePreloadCache = new Map()
+const museumVideoPreloadCache = new Map()
+const museumVideoBlobUrlCache = new Map()
 
 if(mobileDegreeImage)
 {
@@ -155,6 +161,8 @@ const museumImages = Object.entries(museumImageModules)
 const museumVideos = Object.entries(museumVideoModules)
     .sort(([pathA], [pathB]) => museumAssetCollator.compare(pathA, pathB))
     .map(normalizeMuseumAsset)
+
+const getPreloadedMuseumVideoUrl = (url) => museumVideoBlobUrlCache.get(url) ?? url
 
 const findMuseumAsset = (assets, keywords) =>
     assets.find((asset) => keywords.every((keyword) => asset.normalizedName.includes(keyword)))
@@ -227,7 +235,8 @@ const renderMuseumMedia = () =>
 
         if(selectedVideo)
         {
-            trigger.dataset.videoSrc = selectedVideo.url
+            trigger.dataset.videoOriginalSrc = selectedVideo.url
+            trigger.dataset.videoSrc = getPreloadedMuseumVideoUrl(selectedVideo.url)
             trigger.dataset.videoTitle = selectedVideo.title
         }
 
@@ -300,7 +309,8 @@ const openMuseumImageLightbox = (trigger) =>
 
 const openMuseumVideoLightbox = (trigger) =>
 {
-    const videoSrc = trigger.dataset.videoSrc
+    const originalVideoSrc = trigger.dataset.videoOriginalSrc || trigger.dataset.videoSrc
+    const videoSrc = getPreloadedMuseumVideoUrl(originalVideoSrc)
     const videoPoster = trigger.dataset.videoPoster
     const videoTitle = trigger.dataset.videoTitle ?? 'Museum video preview'
 
@@ -528,7 +538,20 @@ const preloadCertificateImage = (url, priority = 'auto') =>
             resolve(result)
         }
 
-        const handleLoad = () => finalize(preloader)
+        const finishWithDecode = () =>
+        {
+            const complete = () => finalize(preloader.naturalWidth > 0 ? preloader : null)
+
+            if(typeof preloader.decode === 'function')
+            {
+                preloader.decode().catch(() => null).finally(complete)
+                return
+            }
+
+            complete()
+        }
+
+        const handleLoad = () => finishWithDecode()
         const handleError = () => finalize(null)
 
         preloader.addEventListener('load', handleLoad, { once: true })
@@ -537,7 +560,7 @@ const preloadCertificateImage = (url, priority = 'auto') =>
 
         if(preloader.complete)
         {
-            finalize(preloader.naturalWidth > 0 ? preloader : null)
+            finishWithDecode()
         }
     })
 
@@ -561,26 +584,140 @@ const preloadCertificateNeighbors = (index) =>
 }
 
 const preloadCertificateGallery = () =>
-{
-    certificateSlides.forEach((slide, index) =>
+    certificateSlides.map((slide, index) =>
     {
         const priority = index < 3 ? 'high' : 'low'
-        preloadCertificateImage(slide.image, priority)
+        return () => preloadCertificateImage(slide.image, priority)
     })
+
+const preloadMuseumVideo = (url) =>
+{
+    if(!url)
+    {
+        return Promise.resolve(null)
+    }
+
+    const cachedPromise = museumVideoPreloadCache.get(url)
+
+    if(cachedPromise)
+    {
+        return cachedPromise
+    }
+
+    const preloadPromise = fetch(url)
+        .then((response) => response.ok ? response.blob() : null)
+        .then((blob) =>
+        {
+            if(!blob)
+            {
+                return null
+            }
+
+            const existingUrl = museumVideoBlobUrlCache.get(url)
+
+            if(existingUrl)
+            {
+                return existingUrl
+            }
+
+            const objectUrl = URL.createObjectURL(blob)
+            museumVideoBlobUrlCache.set(url, objectUrl)
+            return objectUrl
+        })
+        .catch(() => null)
+
+    museumVideoPreloadCache.set(url, preloadPromise)
+
+    return preloadPromise
 }
 
-const scheduleCertificateGalleryPreload = () =>
+const updateSiteLoaderProgress = (completed, total) =>
 {
-    const runPreload = () => preloadCertificateGallery()
+    const safeTotal = Math.max(total, 1)
+    const percentage = Math.min(100, Math.round((completed / safeTotal) * 100))
 
-    if(typeof window !== 'undefined' && 'requestIdleCallback' in window)
+    if(siteLoaderProgress)
     {
-        window.requestIdleCallback(runPreload, { timeout: 1500 })
+        siteLoaderProgress.style.width = `${percentage}%`
+    }
+
+    if(siteLoaderValue)
+    {
+        siteLoaderValue.textContent = `${percentage}%`
+    }
+
+    if(siteLoaderLabel)
+    {
+        siteLoaderLabel.textContent = completed >= total
+            ? 'Finalizing portfolio...'
+            : `Loading media ${completed}/${total}`
+    }
+}
+
+const revealSite = () =>
+{
+    document.body.classList.remove('site-loading')
+
+    if(!siteLoader)
+    {
         return
     }
 
-    window.setTimeout(runPreload, 250)
+    siteLoader.classList.add('is-loaded')
+    siteLoader.setAttribute('aria-hidden', 'true')
+
+    window.setTimeout(() =>
+    {
+        siteLoader.hidden = true
+    }, 560)
 }
+
+const preloadInitialExperience = async () =>
+{
+    const imageUrls = [...new Set([
+        diplomaImage,
+        ...certificateSlides.map((slide) => slide.image),
+        ...museumImages.map((asset) => asset.url)
+    ])]
+    const videoUrls = [...new Set(museumVideos.map((asset) => asset.url))]
+    const tasks = [
+        ...preloadCertificateGallery(),
+        ...imageUrls
+            .filter((url) => !certificateSlides.some((slide) => slide.image === url))
+            .map((url) => () => preloadCertificateImage(url, 'high')),
+        ...videoUrls.map((url) => () => preloadMuseumVideo(url))
+    ]
+    const minimumDelay = new Promise((resolve) => window.setTimeout(resolve, 720))
+    let completed = 0
+
+    updateSiteLoaderProgress(0, tasks.length)
+
+    await Promise.allSettled(tasks.map(async (task) =>
+    {
+        await task()
+        completed += 1
+        updateSiteLoaderProgress(completed, tasks.length)
+    }))
+
+    await minimumDelay
+    renderMuseumMedia()
+    renderCertificate()
+    updateSiteLoaderProgress(tasks.length, tasks.length)
+    revealSite()
+}
+
+const initializeExperienceLoader = () =>
+{
+    void preloadInitialExperience()
+}
+
+window.addEventListener('beforeunload', () =>
+{
+    museumVideoBlobUrlCache.forEach((objectUrl) =>
+    {
+        URL.revokeObjectURL(objectUrl)
+    })
+})
 
 const renderCertificate = () =>
 {
@@ -663,7 +800,7 @@ window.addEventListener('keydown', (event) =>
 
 renderCertificate()
 renderMuseumMedia()
-scheduleCertificateGalleryPreload()
+initializeExperienceLoader()
 
 const scene = new THREE.Scene()
 const sizes = {
@@ -1535,4 +1672,5 @@ const tick = () =>
 }
 
 tick()
+
 

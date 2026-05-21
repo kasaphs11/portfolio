@@ -6,7 +6,19 @@
     <title>Stefanos Kasapis | Portfolio</title>
     <link rel="stylesheet" href="./style.css">
 </head>
-<body>
+<body class="site-loading">
+    <div class="site-loader" data-site-loader role="status" aria-live="polite" aria-label="Loading portfolio media">
+        <div class="site-loader-panel">
+            <span class="site-loader-mark">SK</span>
+            <h2 class="site-loader-title">Loading Portfolio</h2>
+            <p class="site-loader-copy" data-site-loader-label>Preparing media...</p>
+            <div class="site-loader-bar" aria-hidden="true">
+                <span data-site-loader-progress></span>
+            </div>
+            <p class="site-loader-value" data-site-loader-value>0%</p>
+        </div>
+    </div>
+
     <canvas class="webgl"></canvas>
 
     <header class="site-nav">
@@ -215,3 +227,4 @@
     <script type="module" src="./script.js"></script>
 </body>
 </html>
+
