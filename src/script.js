@@ -651,7 +651,7 @@ const updateSiteLoaderProgress = (completed, total) =>
     {
         siteLoaderLabel.textContent = completed >= total
             ? 'Finalizing portfolio...'
-            : `Loading media ${completed}/${total}`
+            : `Loading...`
     }
 }
 
