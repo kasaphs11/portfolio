@@ -114,6 +114,7 @@ let activeMuseumTrigger = null
 const certificateImagePreloadCache = new Map()
 const museumVideoPreloadCache = new Map()
 const museumVideoBlobUrlCache = new Map()
+let certificateRenderToken = 0
 
 if(mobileDegreeImage)
 {
@@ -711,6 +712,15 @@ const initializeExperienceLoader = () =>
     void preloadInitialExperience()
 }
 
+const nextAnimationFrame = () =>
+    new Promise((resolve) =>
+    {
+        window.requestAnimationFrame(() =>
+        {
+            resolve()
+        })
+    })
+
 window.addEventListener('beforeunload', () =>
 {
     museumVideoBlobUrlCache.forEach((objectUrl) =>
@@ -719,24 +729,39 @@ window.addEventListener('beforeunload', () =>
     })
 })
 
-const renderCertificate = () =>
+const renderCertificate = async () =>
 {
-    const certificate = certificateSlides[currentCertificateIndex]
+    const targetIndex = currentCertificateIndex
+    const certificate = certificateSlides[targetIndex]
+    const renderToken = ++certificateRenderToken
 
     if(!certificateTitle || !certificateIssuer || !certificateDescription || !certificateTags || !certificateCounter || !certificateStatus || !certificateImage)
     {
         return
     }
 
+    await preloadCertificateImage(certificate.image, 'high')
+
+    if(renderToken !== certificateRenderToken || targetIndex !== currentCertificateIndex)
+    {
+        return
+    }
+
+    preloadCertificateNeighbors(targetIndex)
+    await nextAnimationFrame()
+
+    if(renderToken !== certificateRenderToken || targetIndex !== currentCertificateIndex)
+    {
+        return
+    }
+
+    certificateImage.src = certificate.image
+    certificateImage.alt = certificate.alt
     certificateStatus.textContent = certificate.label
     certificateTitle.textContent = certificate.title
     certificateIssuer.textContent = certificate.issuer
     certificateDescription.textContent = certificate.description
-    certificateCounter.textContent = `${String(currentCertificateIndex + 1).padStart(2, '0')} / ${String(certificateSlides.length).padStart(2, '0')}`
-    certificateImage.src = certificate.image
-    certificateImage.alt = certificate.alt
-    preloadCertificateImage(certificate.image, 'high')
-    preloadCertificateNeighbors(currentCertificateIndex)
+    certificateCounter.textContent = `${String(targetIndex + 1).padStart(2, '0')} / ${String(certificateSlides.length).padStart(2, '0')}`
     certificateTags.replaceChildren(
         ...certificate.tags.map((tag) =>
         {
@@ -1672,5 +1697,7 @@ const tick = () =>
 }
 
 tick()
+
+
 
 
