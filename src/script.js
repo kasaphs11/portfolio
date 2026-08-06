@@ -1,5 +1,9 @@
 import * as THREE from 'three'
+import { inject } from '@vercel/analytics'
 import diplomaImage from '../certificates/diploma.jpg'
+
+// Initialize Vercel Analytics
+inject()
 
 const canvas = document.querySelector('canvas.webgl')
 const sections = [...document.querySelectorAll('.panel-section')]
