@@ -372,7 +372,7 @@ const renderMuseumMedia = () =>
     const quizImage = findMuseumAsset(museumImages, ['quiz'])
     const lakeVideoPoster = findMuseumAsset(museumImages, ['screenshot', '3'])
     const quizVideoPoster = findMuseumAsset(museumImages, ['screenshot', '2'])
-    const lakeVideo = findMuseumAsset(museumVideos, ['lake'])
+    const lakeVideo = findMuseumAsset(museumVideos, ['lake', 'trailer']) || findMuseumAsset(museumVideos, ['lake'])
     const quizVideo = findMuseumAsset(museumVideos, ['quiz'])
 
     if(museumImageLake && lakeImage)
