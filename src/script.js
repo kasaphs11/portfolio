@@ -20,7 +20,6 @@ const certificateImage = document.querySelector('[data-cert-image]')
 const mobileDegreeImage = document.querySelector('[data-mobile-degree-image]')
 const certificatePrev = document.querySelector('[data-cert-prev]')
 const certificateNext = document.querySelector('[data-cert-next]')
-const museumImageMain = document.querySelector('[data-museum-image-main]')
 const museumImageLake = document.querySelector('[data-museum-image-lake]')
 const museumImageQuiz = document.querySelector('[data-museum-image-quiz]')
 const museumVideoPosterLake = document.querySelector('[data-museum-video-poster-lake]')
@@ -35,6 +34,12 @@ const museumLightbox = document.querySelector('[data-museum-lightbox]')
 const museumLightboxImage = document.querySelector('[data-museum-lightbox-image]')
 const museumLightboxVideo = document.querySelector('[data-museum-lightbox-video]')
 const museumLightboxCloseButtons = [...document.querySelectorAll('[data-museum-lightbox-close]')]
+const siteNav = document.querySelector('.site-nav')
+const siteShotImages = [...document.querySelectorAll('[data-site-shot]')]
+const siteTiltElements = [...document.querySelectorAll('[data-site-tilt]')]
+const revealElements = [...document.querySelectorAll('[data-reveal]')]
+const currentYearElements = [...document.querySelectorAll('[data-current-year]')]
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 const certificates = [
     {
@@ -132,6 +137,32 @@ const museumVideoModules = import.meta.glob('../museum/*.{mp4,webm,ogg}', {
     import: 'default'
 })
 
+const siteShotModules = import.meta.glob('../sites/*.{jpg,jpeg,png,webp}', {
+    eager: true,
+    import: 'default'
+})
+
+const siteShotUrlsByName = Object.fromEntries(
+    Object.entries(siteShotModules).map(([path, url]) =>
+    [
+        path.replace(/\\/g, '/').split('/').pop().replace(/\.[^.]+$/, '').toLowerCase(),
+        url
+    ])
+)
+
+const renderSiteShots = () =>
+{
+    siteShotImages.forEach((image) =>
+    {
+        const url = siteShotUrlsByName[image.dataset.siteShot]
+
+        if(url && image.getAttribute('src') !== url)
+        {
+            image.src = url
+        }
+    })
+}
+
 const museumAssetCollator = new Intl.Collator(undefined, {
     numeric: true,
     sensitivity: 'base'
@@ -170,7 +201,6 @@ const findMuseumAsset = (assets, keywords) =>
 
 const renderMuseumMedia = () =>
 {
-    const museumMainImage = findMuseumAsset(museumImages, ['486043026'])
     const lakeImage = findMuseumAsset(museumImages, ['lake'])
     const quizImage = findMuseumAsset(museumImages, ['quiz'])
     const lakeVideoPoster = findMuseumAsset(museumImages, ['screenshot', '3'])
@@ -178,16 +208,9 @@ const renderMuseumMedia = () =>
     const lakeVideo = findMuseumAsset(museumVideos, ['lake'])
     const quizVideo = findMuseumAsset(museumVideos, ['quiz'])
 
-    if(museumImageMain && museumMainImage)
-    {
-        museumImageMain.src = museumMainImage.url
-        museumImageMain.alt = 'Museum exhibit preview'
-    }
-
     if(museumImageLake && lakeImage)
     {
         museumImageLake.src = lakeImage.url
-        museumImageLake.alt = lakeImage.title
     }
 
     if(museumTitleLakeImage)
@@ -198,7 +221,6 @@ const renderMuseumMedia = () =>
     if(museumImageQuiz && quizImage)
     {
         museumImageQuiz.src = quizImage.url
-        museumImageQuiz.alt = quizImage.title
     }
 
     if(museumTitleQuizImage)
@@ -209,7 +231,6 @@ const renderMuseumMedia = () =>
     if(museumVideoPosterLake && lakeVideoPoster)
     {
         museumVideoPosterLake.src = lakeVideoPoster.url
-        museumVideoPosterLake.alt = 'Lake video preview'
     }
 
     if(museumTitleLakeVideo)
@@ -220,7 +241,6 @@ const renderMuseumMedia = () =>
     if(museumVideoPosterQuiz && quizVideoPoster)
     {
         museumVideoPosterQuiz.src = quizVideoPoster.url
-        museumVideoPosterQuiz.alt = 'Quiz video preview'
     }
 
     if(museumTitleQuizVideo)
@@ -281,7 +301,7 @@ const closeMuseumLightbox = () =>
 
 const openMuseumImageLightbox = (trigger) =>
 {
-    const sourceImage = trigger.querySelector('.museum-image')
+    const sourceImage = trigger.querySelector('img')
 
     if(!museumLightbox || !museumLightboxImage || !sourceImage?.getAttribute('src'))
     {
@@ -678,7 +698,8 @@ const preloadInitialExperience = async () =>
     const imageUrls = [...new Set([
         diplomaImage,
         ...certificateSlides.map((slide) => slide.image),
-        ...museumImages.map((asset) => asset.url)
+        ...museumImages.map((asset) => asset.url),
+        ...Object.values(siteShotUrlsByName)
     ])]
     const videoUrls = [...new Set(museumVideos.map((asset) => asset.url))]
     const tasks = [
@@ -701,6 +722,7 @@ const preloadInitialExperience = async () =>
     }))
 
     await minimumDelay
+    renderSiteShots()
     renderMuseumMedia()
     renderCertificate()
     updateSiteLoaderProgress(tasks.length, tasks.length)
@@ -823,7 +845,65 @@ window.addEventListener('keydown', (event) =>
     }
 })
 
+currentYearElements.forEach((element) =>
+{
+    element.textContent = String(new Date().getFullYear())
+})
+
+if('IntersectionObserver' in window && !prefersReducedMotion)
+{
+    document.documentElement.classList.add('has-reveal')
+
+    const revealObserver = new IntersectionObserver((entries) =>
+    {
+        entries.forEach((entry) =>
+        {
+            if(entry.isIntersecting)
+            {
+                entry.target.classList.add('is-revealed')
+                revealObserver.unobserve(entry.target)
+            }
+        })
+    }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' })
+
+    revealElements.forEach((element) => revealObserver.observe(element))
+}
+
+siteTiltElements.forEach((element) =>
+{
+    if(prefersReducedMotion)
+    {
+        return
+    }
+
+    element.addEventListener('pointermove', (event) =>
+    {
+        if(event.pointerType !== 'mouse' || window.innerWidth <= 900)
+        {
+            return
+        }
+
+        const bounds = element.getBoundingClientRect()
+        const x = (event.clientX - bounds.left) / bounds.width - 0.5
+        const y = (event.clientY - bounds.top) / bounds.height - 0.5
+
+        element.style.setProperty('--tilt-x', `${(-y * 6).toFixed(2)}deg`)
+        element.style.setProperty('--tilt-y', `${(x * 8).toFixed(2)}deg`)
+        element.style.setProperty('--glare-x', `${((x + 0.5) * 100).toFixed(1)}%`)
+        element.style.setProperty('--glare-y', `${((y + 0.5) * 100).toFixed(1)}%`)
+        element.classList.add('is-tilting')
+    })
+
+    element.addEventListener('pointerleave', () =>
+    {
+        element.style.setProperty('--tilt-x', '0deg')
+        element.style.setProperty('--tilt-y', '0deg')
+        element.classList.remove('is-tilting')
+    })
+})
+
 renderCertificate()
+renderSiteShots()
 renderMuseumMedia()
 initializeExperienceLoader()
 
@@ -1308,6 +1388,24 @@ const desktopLayouts = {
         degreeFloat: 0.02,
         sceneParallax: 1
     },
+    sites: {
+        cameraZ: 6.4,
+        torusX: 3.9,
+        torusY: -1.6,
+        torusScale: 0.52,
+        torusOpacity: 0.35,
+        torusRotationOffset: 0.9,
+        torusFloat: 0.05,
+        degreeX: -5.9,
+        degreeY: 0.2,
+        degreeScale: 0.72,
+        degreeOpacity: 0,
+        degreeRotationX: -0.08,
+        degreeRotationY: 0.22,
+        degreeRotationZ: -0.08,
+        degreeFloat: 0,
+        sceneParallax: 0.4
+    },
     credentials: {
         cameraZ: 6.15,
         torusX: 4.6,
@@ -1544,6 +1642,8 @@ const updateActiveSection = () =>
     })
 }
 
+let pageJumpTimeout = null
+
 scrollLinks.forEach((link) =>
 {
     const targetSelector = link.getAttribute('href')
@@ -1563,10 +1663,35 @@ scrollLinks.forEach((link) =>
         }
 
         event.preventDefault()
-        targetElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        })
+
+        const card = targetElement.querySelector('.section-card') ?? targetElement
+        const isMobile = sizes.width <= 900
+        const navBottom = !isMobile && siteNav ? siteNav.getBoundingClientRect().bottom : 0
+        const offset = navBottom + (isMobile ? 16 : 24)
+        const top = targetSelector === '#home'
+            ? 0
+            : Math.max(card.getBoundingClientRect().top + getPageScroll() - offset, 0)
+
+        const jump = () => window.scrollTo({ top, behavior: 'instant' })
+
+        if(prefersReducedMotion)
+        {
+            jump()
+            return
+        }
+
+        window.clearTimeout(pageJumpTimeout)
+        document.body.classList.add('is-page-jumping')
+
+        pageJumpTimeout = window.setTimeout(() =>
+        {
+            jump()
+            updateActiveSection()
+            window.requestAnimationFrame(() =>
+            {
+                document.body.classList.remove('is-page-jumping')
+            })
+        }, 220)
     })
 })
 

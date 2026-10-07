@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stefanos Kasapis | Portfolio</title>
+    <meta name="description" content="Stefanos Kasapis — Game Developer and creative web developer. Unreal Engine, C++, Three.js and custom websites for local businesses.">
+    <meta name="theme-color" content="#1e1a20">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <meta property="og:title" content="Stefanos Kasapis | Portfolio">
+    <meta property="og:description" content="Game Developer and creative web developer — Unreal Engine, C++, Three.js and custom websites.">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="./style.css">
 </head>
 <body class="site-loading">
@@ -26,8 +32,9 @@
 
         <nav class="page-nav" aria-label="Portfolio sections">
             <a class="page-link is-active" href="#home" data-scroll-link data-section="home">Intro</a>
-            <a class="page-link" href="#credentials" data-scroll-link data-section="credentials">Degree &amp; Certifications</a>
-            <a class="page-link" href="#museum" data-scroll-link data-section="museum">Museum Project</a>
+            <a class="page-link" href="#credentials" data-scroll-link data-section="credentials"><span class="label-full">Degree &amp; Certifications</span><span class="label-short">Degree</span></a>
+            <a class="page-link" href="#museum" data-scroll-link data-section="museum"><span class="label-full">Museum Project</span><span class="label-short">Museum</span></a>
+            <a class="page-link" href="#sites" data-scroll-link data-section="sites">Websites</a>
         </nav>
     </header>
 
@@ -49,6 +56,18 @@
                         <span>Unreal Engine</span>
                         <span>C++</span>
                         <span>Blueprints</span>
+                        <span>Three.js</span>
+                        <span>Web Design</span>
+                    </div>
+                    <div class="hero-work-links">
+                        <a class="hero-work-link" href="#museum" data-scroll-link>
+                            <span>See my museum project</span>
+                            <span class="hero-work-arrow" aria-hidden="true">&darr;</span>
+                        </a>
+                        <a class="hero-work-link" href="#sites" data-scroll-link>
+                            <span>See the websites I've built</span>
+                            <span class="hero-work-arrow" aria-hidden="true">&darr;</span>
+                        </a>
                     </div>
                 </div>
                 <div class="hero-contact">
@@ -129,14 +148,25 @@
 
         <section class="panel-section section-museum" id="museum" data-section="museum">
             <div class="section-card gallery-panel">
-                <div class="section-copy">
-                    <p class="section-kicker">Museum Feature</p>
+                <div class="section-copy museum-copy">
+                    <p class="section-kicker">Museum Installation</p>
                     <h2 class="section-title">Project In The Museum</h2>
                     <p class="section-description">
-                        Two projects created in collaboration with Professor Ioannis Fountos are featured inside
-                        GENERAL ARCHIVES OF GREECE - HISTORICAL ARCHIVES - MUSEUM OF EPIRUS and form an active part
-                        of the museum itself.
+                        Two interactive games, built in <strong>Unreal Engine</strong> in collaboration with Professor
+                        Ioannis Fountos, are installed inside the GENERAL ARCHIVES OF GREECE - HISTORICAL ARCHIVES -
+                        MUSEUM OF EPIRUS and form an active part of the museum itself.
                     </p>
+                    <p class="section-description">
+                        They run on touchscreen kiosks in the exhibition <em>&ldquo;Benefaction and Benefactors,
+                        18th&ndash;20th century&rdquo;</em>, turning historical engravings and maps into playable
+                        experiences, with the menus, UI and gameplay logic built in Blueprints.
+                    </p>
+                    <div class="museum-badges" aria-label="Project highlights">
+                        <span class="museum-badge museum-badge-engine">Built with Unreal Engine</span>
+                        <span class="museum-badge">Blueprints</span>
+                        <span class="museum-badge">Touchscreen Kiosks</span>
+                        <span class="museum-badge">Live In The Museum</span>
+                    </div>
                     <a
                         class="museum-map-link"
                         href="https://www.google.com/maps/search/?api=1&query=%CE%93.%CE%91.%CE%9A.%20-%20%CE%99%CF%83%CF%84%CE%BF%CF%81%CE%B9%CE%BA%CF%8C%20%CE%91%CF%81%CF%87%CE%B5%CE%AF%CE%BF%20%CE%9C%CE%BF%CF%85%CF%83%CE%B5%CE%AF%CE%BF%20%CE%97%CF%80%CE%B5%CE%AF%CF%81%CE%BF%CF%85%2C%20%CE%91%CF%81%CF%87%CE%B5%CE%AF%CE%BF%CF%85%20%CF%84%CE%BF%CF%85%20%CE%9A%CF%81%CE%AC%CF%84%CE%BF%CF%85%CF%82%2C%20%CE%A3%CE%BF%CF%85%CF%86%CE%B1%CF%81%CE%AF%20%CE%A3%CE%B1%CF%81%CE%AC%CE%B9%2C%20%CE%9A%CE%AC%CF%83%CF%84%CF%81%CE%BF%2C%20%CE%94.%20%CE%A6%CE%B9%CE%BB%CE%BF%CF%83%CF%8C%CF%86%CE%BF%CF%85%20%CE%BA%CE%B1%CE%B9%20%CE%93%CE%BB%CF%85%CE%BA%CE%AF%CE%B4%CF%89%CE%BD%201%2C%20%CE%99%CF%89%CE%AC%CE%BD%CE%BD%CE%B9%CE%BD%CE%B1%20452%2021"
@@ -147,83 +177,195 @@
                     </a>
                 </div>
 
-                <div class="media-layout">
-                    <article class="media-card media-feature">
-                        <span class="card-label">Museum Exhibit</span>
-                        <div class="museum-image-shell museum-media-shell museum-feature-shell">
-                            <button class="museum-image-trigger" type="button" data-museum-lightbox-trigger>
-                                <img
-                                    class="museum-image museum-image-main"
-                                    data-museum-image-main
-                                    alt="Museum exhibit preview"
-                                    loading="lazy"
-                                />
+                <div class="exhibit-list">
+                    <article class="exhibit-card" data-reveal>
+                        <div class="exhibit-media">
+                            <button class="museum-video-trigger exhibit-video" type="button" data-museum-video-lightbox-trigger="lake" aria-label="Play the Lake game video">
+                                <img class="museum-video-poster exhibit-poster" data-museum-video-poster-lake alt="Lake game main menu with an engraving of Ioannina castle" loading="lazy" />
+                                <span class="museum-video-play" aria-hidden="true"></span>
+                                <span class="exhibit-watch">Watch gameplay</span>
                             </button>
+                        </div>
+
+                        <div class="exhibit-body">
+                            <div class="site-meta">
+                                <span class="site-index">01</span>
+                                <span class="site-client">Unreal Engine &middot; Interactive Game</span>
+                            </div>
+                            <h3 class="exhibit-title">The Lake</h3>
+                            <p class="exhibit-description">
+                                An interactive game built around a historical engraving of the castle and lake of
+                                Ioannina, playable by visitors directly on the museum's touchscreen kiosk.
+                            </p>
+                            <p class="exhibit-credits">Stefanos Kasapis &middot; Georgios Paximadakis &middot; Ioannis Fountos</p>
+
+                            <div class="exhibit-footer">
+                                <button class="museum-image-trigger exhibit-photo" type="button" data-museum-lightbox-trigger aria-label="See the Lake game installed in the museum">
+                                    <img class="museum-image" data-museum-image-lake alt="The Lake game running on a touchscreen kiosk in the museum" loading="lazy" />
+                                </button>
+                                <div class="exhibit-photo-copy">
+                                    <span>In the museum</span>
+                                    <small>Tap to view the kiosk</small>
+                                </div>
+                            </div>
                         </div>
                     </article>
 
-                    <div class="media-stack">
-                        <article class="media-card">
-                            <span class="card-label">Lake Photo</span>
-                            <div class="museum-image-shell museum-media-shell">
-                                <button class="museum-image-trigger" type="button" data-museum-lightbox-trigger>
-                                    <img
-                                        class="museum-image"
-                                        data-museum-image-lake
-                                        alt="Lake museum project photo"
-                                        loading="lazy"
-                                    />
-                                </button>
-                            </div>
-                        </article>
+                    <article class="exhibit-card" data-reveal>
+                        <div class="exhibit-media">
+                            <button class="museum-video-trigger exhibit-video" type="button" data-museum-video-lightbox-trigger="quiz" aria-label="Play the quiz game video">
+                                <img class="museum-video-poster exhibit-poster" data-museum-video-poster-quiz alt="Lassa quiz main menu on an antique world map" loading="lazy" />
+                                <span class="museum-video-play" aria-hidden="true"></span>
+                                <span class="exhibit-watch">Watch gameplay</span>
+                            </button>
+                        </div>
 
-                        <article class="media-card">
-                            <span class="card-label">Quiz Photo</span>
-                            <div class="museum-image-shell museum-media-shell">
-                                <button class="museum-image-trigger" type="button" data-museum-lightbox-trigger>
-                                    <img
-                                        class="museum-image"
-                                        data-museum-image-quiz
-                                        alt="Quiz museum project photo"
-                                        loading="lazy"
-                                    />
-                                </button>
+                        <div class="exhibit-body">
+                            <div class="site-meta">
+                                <span class="site-index">02</span>
+                                <span class="site-client">Unreal Engine &middot; History Quiz</span>
                             </div>
-                        </article>
+                            <h3 class="exhibit-title">&laquo;Lassa&raquo; Quiz</h3>
+                            <p class="exhibit-description">
+                                A history quiz from the History Explorers series, presented over an antique world map
+                                and played by touch on the museum's kiosk.
+                            </p>
+                            <p class="exhibit-credits">Stefanos Kasapis &middot; Ioannis Fountos</p>
 
-                        <article class="media-card">
-                            <span class="card-label">Lake Video</span>
-                            <div class="museum-video-shell museum-video-shell-compact museum-media-shell">
-                                <button class="museum-video-trigger" type="button" data-museum-video-lightbox-trigger="lake" aria-label="Play Lake video">
-                                    <img
-                                        class="museum-video-poster"
-                                        data-museum-video-poster-lake
-                                        alt="Lake video preview"
-                                        loading="lazy"
-                                    />
-                                    <span class="museum-video-play" aria-hidden="true"></span>
+                            <div class="exhibit-footer">
+                                <button class="museum-image-trigger exhibit-photo" type="button" data-museum-lightbox-trigger aria-label="See the quiz installed in the museum">
+                                    <img class="museum-image" data-museum-image-quiz alt="The Lassa quiz running on a touchscreen kiosk in the museum" loading="lazy" />
                                 </button>
+                                <div class="exhibit-photo-copy">
+                                    <span>In the museum</span>
+                                    <small>Tap to view the kiosk</small>
+                                </div>
                             </div>
-                        </article>
-
-                        <article class="media-card">
-                            <span class="card-label">Quiz Video</span>
-                            <div class="museum-video-shell museum-video-shell-compact museum-media-shell">
-                                <button class="museum-video-trigger" type="button" data-museum-video-lightbox-trigger="quiz" aria-label="Play Quiz video">
-                                    <img
-                                        class="museum-video-poster"
-                                        data-museum-video-poster-quiz
-                                        alt="Quiz video preview"
-                                        loading="lazy"
-                                    />
-                                    <span class="museum-video-play" aria-hidden="true"></span>
-                                </button>
-                            </div>
-                        </article>
-                    </div>
+                        </div>
+                    </article>
                 </div>
             </div>
         </section>
+
+        <section class="panel-section section-sites" id="sites" data-section="sites">
+            <div class="section-card sites-panel">
+                <div class="sites-header">
+                    <div class="section-copy">
+                        <p class="section-kicker">Client Work</p>
+                        <h2 class="section-title">Websites</h2>
+                        <p class="section-description">
+                            Custom websites designed and built from scratch for local businesses, bringing real-time 3D,
+                            cinematic renders and smooth, responsive layouts to the web.
+                        </p>
+                    </div>
+                    <div class="sites-count" aria-hidden="true">
+                        <strong>02</strong>
+                        <span>Client projects</span>
+                    </div>
+                </div>
+
+                <div class="site-list">
+                    <article class="site-project" data-reveal>
+                        <div class="site-preview" data-site-tilt>
+                            <div class="browser-frame">
+                                <div class="browser-bar" aria-hidden="true">
+                                    <span class="browser-dots"><i></i><i></i><i></i></span>
+                                    <span class="browser-url">La Crema &middot; Coffee &amp; Patisserie</span>
+                                </div>
+                                <button class="site-shot-trigger" type="button" data-museum-lightbox-trigger aria-label="Open La Crema preview">
+                                    <img class="site-shot" data-site-shot="lacrema" alt="La Crema website homepage with a 3D coffee cup and bougatsa on marble" loading="lazy">
+                                </button>
+                            </div>
+                            <span class="site-preview-glow site-preview-glow-warm" aria-hidden="true"></span>
+                        </div>
+
+                        <div class="site-info">
+                            <div class="site-meta">
+                                <span class="site-index">01</span>
+                                <span class="site-client">Caf&eacute; &amp; Patisserie &middot; Veria, Greece</span>
+                            </div>
+                            <h3 class="site-title">La Crema</h3>
+                            <p class="site-description">
+                                A warm, editorial website for a patisserie running since 1976. The homepage opens on a
+                                real-time 3D scene, a branded coffee cup and bougatsa on marble, that follows the visitor
+                                through the coffee, bougatsa, patisserie and events chapters.
+                            </p>
+                            <ul class="site-features">
+                                <li>Real-time 3D scene in Three.js with custom GLB models</li>
+                                <li>Scroll-driven storytelling across the menu chapters</li>
+                                <li>Local SEO with structured data for the caf&eacute;</li>
+                                <li>Responsive, mobile-first layout and navigation</li>
+                            </ul>
+                            <div class="credential-tags site-tags">
+                                <span>Three.js</span>
+                                <span>WebGL</span>
+                                <span>3D Models</span>
+                                <span>Vite</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="site-project site-project-reverse" data-reveal>
+                        <div class="site-preview" data-site-tilt>
+                            <div class="browser-frame">
+                                <div class="browser-bar" aria-hidden="true">
+                                    <span class="browser-dots"><i></i><i></i><i></i></span>
+                                    <span class="browser-url">FireZone by Pasvantidis</span>
+                                </div>
+                                <button class="site-shot-trigger" type="button" data-museum-lightbox-trigger aria-label="Open FireZone preview">
+                                    <img class="site-shot" data-site-shot="firezone" alt="FireZone website homepage with a cinematic fire extinguisher scene" loading="lazy">
+                                </button>
+                            </div>
+                            <span class="site-preview-glow site-preview-glow-fire" aria-hidden="true"></span>
+                        </div>
+
+                        <div class="site-info">
+                            <div class="site-meta">
+                                <span class="site-index">02</span>
+                                <span class="site-client">Fire Safety Equipment &middot; Veria, Greece</span>
+                            </div>
+                            <h3 class="site-title">FireZone</h3>
+                            <p class="site-description">
+                                A cinematic website for a fire-safety company with over 30 years of experience. A
+                                Blender-rendered hero with live fire and reflections animates as the visitor scrolls,
+                                leading into services, the extinguisher catalogue and contact details.
+                            </p>
+                            <ul class="site-features">
+                                <li>Scroll-driven hero animation rendered frame by frame in Blender</li>
+                                <li>Canvas-animated fire, reflections and branded intro loader</li>
+                                <li>Dark / light theme that remembers the visitor's choice</li>
+                                <li>Lenis smooth scrolling that respects reduced motion</li>
+                            </ul>
+                            <div class="credential-tags site-tags">
+                                <span>Blender</span>
+                                <span>Canvas</span>
+                                <span>Lenis</span>
+                                <span>JavaScript</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <footer class="site-footer">
+            <div class="section-card footer-card" data-reveal>
+                <p class="section-kicker">Let's work together</p>
+                <h2 class="footer-title">Have a game, a 3D idea or a website in mind?</h2>
+                <div class="hero-actions footer-actions">
+                    <a class="section-link primary-link" href="mailto:stefanos.kasapis@hotmail.gr">Email me</a>
+                    <a
+                        class="section-link ghost-link"
+                        href="https://www.linkedin.com/in/stefanos-kasapis-369ab2221"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        LinkedIn
+                    </a>
+                </div>
+                <p class="footer-note">&copy; <span data-current-year>2026</span> Stefanos Kasapis</p>
+            </div>
+        </footer>
     </main>
 
     <div class="museum-lightbox" data-museum-lightbox hidden aria-hidden="true">
