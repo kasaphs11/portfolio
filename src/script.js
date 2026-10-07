@@ -35,8 +35,17 @@ const museumLightboxImage = document.querySelector('[data-museum-lightbox-image]
 const museumLightboxVideo = document.querySelector('[data-museum-lightbox-video]')
 const museumLightboxCloseButtons = [...document.querySelectorAll('[data-museum-lightbox-close]')]
 const siteNav = document.querySelector('.site-nav')
-const siteShotImages = [...document.querySelectorAll('[data-site-shot]')]
-const siteTiltElements = [...document.querySelectorAll('[data-site-tilt]')]
+const siteGrid = document.querySelector('[data-site-grid]')
+const sitesCount = document.querySelector('[data-sites-count]')
+const siteDetail = document.querySelector('[data-site-detail]')
+const siteDetailImage = document.querySelector('[data-site-detail-image]')
+const siteDetailIndex = document.querySelector('[data-site-detail-index]')
+const siteDetailClient = document.querySelector('[data-site-detail-client]')
+const siteDetailTitle = document.querySelector('[data-site-detail-title]')
+const siteDetailDescription = document.querySelector('[data-site-detail-description]')
+const siteDetailFeatures = document.querySelector('[data-site-detail-features]')
+const siteDetailTags = document.querySelector('[data-site-detail-tags]')
+const siteDetailCloseButtons = [...document.querySelectorAll('[data-site-detail-close]')]
 const revealElements = [...document.querySelectorAll('[data-reveal]')]
 const currentYearElements = [...document.querySelectorAll('[data-current-year]')]
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -150,17 +159,175 @@ const siteShotUrlsByName = Object.fromEntries(
     ])
 )
 
-const renderSiteShots = () =>
-{
-    siteShotImages.forEach((image) =>
+const websiteProjects = [
     {
-        const url = siteShotUrlsByName[image.dataset.siteShot]
+        id: 'lacrema',
+        title: 'La Crema',
+        client: 'Café & Patisserie · Veria, Greece',
+        alt: 'La Crema website homepage with a 3D coffee cup and bougatsa on marble',
+        description: 'A warm, editorial website for a patisserie running since 1976. The homepage opens on a real-time 3D scene, a branded coffee cup and bougatsa on marble, that follows the visitor through the coffee, bougatsa, patisserie and events chapters.',
+        features: [
+            'Real-time 3D scene in Three.js with custom GLB models',
+            'Scroll-driven storytelling across the menu chapters',
+            'Local SEO with structured data for the café',
+            'Responsive, mobile-first layout and navigation'
+        ],
+        tags: ['Three.js', 'WebGL', '3D Models', 'Vite']
+    },
+    {
+        id: 'firezone',
+        title: 'FireZone',
+        client: 'Fire Safety Equipment · Veria, Greece',
+        alt: 'FireZone website homepage with a cinematic fire extinguisher scene',
+        description: 'A cinematic website for a fire-safety company with over 30 years of experience. A Blender-rendered hero with live fire and reflections animates as the visitor scrolls, leading into services, the extinguisher catalogue and contact details.',
+        features: [
+            'Scroll-driven hero animation rendered frame by frame in Blender',
+            'Canvas-animated fire, reflections and branded intro loader',
+            'Dark / light theme that remembers the visitor\'s choice',
+            'Lenis smooth scrolling that respects reduced motion'
+        ],
+        tags: ['Blender', 'Canvas', 'Lenis', 'JavaScript']
+    }
+]
 
-        if(url && image.getAttribute('src') !== url)
+let activeSiteCover = null
+
+const padSiteIndex = (value) => String(value).padStart(2, '0')
+
+const closeSiteDetail = () =>
+{
+    if(!siteDetail)
+    {
+        return
+    }
+
+    siteDetail.hidden = true
+    siteDetail.setAttribute('aria-hidden', 'true')
+    document.body.classList.remove('site-detail-open')
+    activeSiteCover?.focus()
+    activeSiteCover = null
+}
+
+const openSiteDetail = (project, trigger) =>
+{
+    if(!siteDetail || !project)
+    {
+        return
+    }
+
+    activeSiteCover = trigger
+    const imageUrl = siteShotUrlsByName[project.id]
+
+    if(siteDetailImage && imageUrl)
+    {
+        siteDetailImage.src = imageUrl
+        siteDetailImage.alt = project.alt
+    }
+
+    if(siteDetailIndex)
+    {
+        const index = websiteProjects.findIndex((item) => item.id === project.id) + 1
+        siteDetailIndex.textContent = padSiteIndex(index)
+    }
+
+    if(siteDetailClient)
+    {
+        siteDetailClient.textContent = project.client
+    }
+
+    if(siteDetailTitle)
+    {
+        siteDetailTitle.textContent = project.title
+    }
+
+    if(siteDetailDescription)
+    {
+        siteDetailDescription.textContent = project.description
+    }
+
+    if(siteDetailFeatures)
+    {
+        siteDetailFeatures.replaceChildren(
+            ...project.features.map((feature) =>
+            {
+                const item = document.createElement('li')
+                item.textContent = feature
+                return item
+            })
+        )
+    }
+
+    if(siteDetailTags)
+    {
+        siteDetailTags.replaceChildren(
+            ...project.tags.map((tag) =>
+            {
+                const element = document.createElement('span')
+                element.textContent = tag
+                return element
+            })
+        )
+    }
+
+    siteDetail.hidden = false
+    siteDetail.setAttribute('aria-hidden', 'false')
+    document.body.classList.add('site-detail-open')
+    siteDetailCloseButtons[0]?.focus()
+}
+
+const renderSiteGrid = () =>
+{
+    if(!siteGrid)
+    {
+        return
+    }
+
+    if(sitesCount)
+    {
+        sitesCount.textContent = padSiteIndex(websiteProjects.length)
+    }
+
+    siteGrid.replaceChildren(
+        ...websiteProjects.map((project, index) =>
         {
-            image.src = url
-        }
-    })
+            const button = document.createElement('button')
+            button.className = 'site-cover'
+            button.type = 'button'
+            button.setAttribute('data-reveal', '')
+            button.setAttribute('aria-label', `Open ${project.title}`)
+
+            const image = document.createElement('img')
+            image.className = 'site-cover-shot'
+            image.alt = project.alt
+            image.loading = 'lazy'
+            image.src = siteShotUrlsByName[project.id] ?? ''
+
+            const shade = document.createElement('span')
+            shade.className = 'site-cover-shade'
+            shade.setAttribute('aria-hidden', 'true')
+
+            const body = document.createElement('span')
+            body.className = 'site-cover-body'
+
+            const projectIndex = document.createElement('span')
+            projectIndex.className = 'site-cover-index'
+            projectIndex.textContent = padSiteIndex(index + 1)
+
+            const title = document.createElement('span')
+            title.className = 'site-cover-title'
+            title.textContent = project.title
+
+            const client = document.createElement('span')
+            client.className = 'site-cover-client'
+            client.textContent = project.client
+
+            body.append(projectIndex, title, client)
+            button.append(image, shade, body)
+            button.addEventListener('click', () => openSiteDetail(project, button))
+
+            return button
+        })
+    )
 }
 
 const museumAssetCollator = new Intl.Collator(undefined, {
@@ -722,7 +889,6 @@ const preloadInitialExperience = async () =>
     }))
 
     await minimumDelay
-    renderSiteShots()
     renderMuseumMedia()
     renderCertificate()
     updateSiteLoaderProgress(tasks.length, tasks.length)
@@ -837,9 +1003,25 @@ museumLightboxCloseButtons.forEach((button) =>
     button.addEventListener('click', closeMuseumLightbox)
 })
 
+siteDetailCloseButtons.forEach((button) =>
+{
+    button.addEventListener('click', closeSiteDetail)
+})
+
 window.addEventListener('keydown', (event) =>
 {
-    if(event.key === 'Escape' && museumLightbox && !museumLightbox.hidden)
+    if(event.key !== 'Escape')
+    {
+        return
+    }
+
+    if(siteDetail && !siteDetail.hidden)
+    {
+        closeSiteDetail()
+        return
+    }
+
+    if(museumLightbox && !museumLightbox.hidden)
     {
         closeMuseumLightbox()
     }
@@ -850,8 +1032,13 @@ currentYearElements.forEach((element) =>
     element.textContent = String(new Date().getFullYear())
 })
 
-if('IntersectionObserver' in window && !prefersReducedMotion)
+const observeRevealElements = (elements) =>
 {
+    if(!('IntersectionObserver' in window) || prefersReducedMotion)
+    {
+        return
+    }
+
     document.documentElement.classList.add('has-reveal')
 
     const revealObserver = new IntersectionObserver((entries) =>
@@ -866,44 +1053,15 @@ if('IntersectionObserver' in window && !prefersReducedMotion)
         })
     }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' })
 
-    revealElements.forEach((element) => revealObserver.observe(element))
+    elements.forEach((element) => revealObserver.observe(element))
 }
 
-siteTiltElements.forEach((element) =>
-{
-    if(prefersReducedMotion)
-    {
-        return
-    }
-
-    element.addEventListener('pointermove', (event) =>
-    {
-        if(event.pointerType !== 'mouse' || window.innerWidth <= 900)
-        {
-            return
-        }
-
-        const bounds = element.getBoundingClientRect()
-        const x = (event.clientX - bounds.left) / bounds.width - 0.5
-        const y = (event.clientY - bounds.top) / bounds.height - 0.5
-
-        element.style.setProperty('--tilt-x', `${(-y * 6).toFixed(2)}deg`)
-        element.style.setProperty('--tilt-y', `${(x * 8).toFixed(2)}deg`)
-        element.style.setProperty('--glare-x', `${((x + 0.5) * 100).toFixed(1)}%`)
-        element.style.setProperty('--glare-y', `${((y + 0.5) * 100).toFixed(1)}%`)
-        element.classList.add('is-tilting')
-    })
-
-    element.addEventListener('pointerleave', () =>
-    {
-        element.style.setProperty('--tilt-x', '0deg')
-        element.style.setProperty('--tilt-y', '0deg')
-        element.classList.remove('is-tilting')
-    })
-})
-
+renderSiteGrid()
+observeRevealElements([
+    ...revealElements,
+    ...document.querySelectorAll('.site-cover[data-reveal]')
+])
 renderCertificate()
-renderSiteShots()
 renderMuseumMedia()
 initializeExperienceLoader()
 
@@ -1445,11 +1603,11 @@ const desktopLayouts = {
 }
 
 const mobileLayout = {
-    cameraZ: 8.35,
+    cameraZ: 9.2,
     torusX: 0,
-    torusY: 1,
-    torusScale: 0.74,
-    torusOpacity: 1,
+    torusY: 1.55,
+    torusScale: 0.52,
+    torusOpacity: 0.72,
     torusRotationOffset: 0,
     torusFloat: 0.04,
     degreeX: 0,
@@ -1666,8 +1824,9 @@ scrollLinks.forEach((link) =>
 
         const card = targetElement.querySelector('.section-card') ?? targetElement
         const isMobile = sizes.width <= 900
-        const navBottom = !isMobile && siteNav ? siteNav.getBoundingClientRect().bottom : 0
-        const offset = navBottom + (isMobile ? 16 : 24)
+        const offset = isMobile
+            ? 12
+            : (siteNav ? siteNav.getBoundingClientRect().bottom : 0) + 24
         const top = targetSelector === '#home'
             ? 0
             : Math.max(card.getBoundingClientRect().top + getPageScroll() - offset, 0)
@@ -1763,7 +1922,17 @@ const tick = () =>
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
 
-    const layout = getLayoutConfig()
+    let layout = getLayoutConfig()
+
+    if(sizes.width <= 900)
+    {
+        const homeHeight = sections[0]?.offsetHeight || sizes.height
+        const torusFade = THREE.MathUtils.clamp(1 - (getPageScroll() / Math.max(homeHeight * 0.45, 1)), 0, 1)
+        layout = {
+            ...layout,
+            torusOpacity: layout.torusOpacity * torusFade
+        }
+    }
 
     camera.position.z += (layout.cameraZ - camera.position.z) * 0.035
 

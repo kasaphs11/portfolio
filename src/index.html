@@ -31,10 +31,24 @@
         <a class="brand-mark" href="#home" data-scroll-link>SK</a>
 
         <nav class="page-nav" aria-label="Portfolio sections">
-            <a class="page-link is-active" href="#home" data-scroll-link data-section="home">Intro</a>
-            <a class="page-link" href="#credentials" data-scroll-link data-section="credentials"><span class="label-full">Degree &amp; Certifications</span><span class="label-short">Degree</span></a>
-            <a class="page-link" href="#museum" data-scroll-link data-section="museum"><span class="label-full">Museum Project</span><span class="label-short">Museum</span></a>
-            <a class="page-link" href="#sites" data-scroll-link data-section="sites">Websites</a>
+            <a class="page-link is-active" href="#home" data-scroll-link data-section="home">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.2 12 4l8 7.2V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1z"/></svg>
+                <span class="nav-label">Intro</span>
+            </a>
+            <a class="page-link" href="#credentials" data-scroll-link data-section="credentials">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a2 2 0 0 1 2 2v14l-7-3-7 3V6a2 2 0 0 1 2-2z"/></svg>
+                <span class="nav-label label-full">Degree &amp; Certifications</span>
+                <span class="nav-label label-short">Degree</span>
+            </a>
+            <a class="page-link" href="#museum" data-scroll-link data-section="museum">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10 12 4l9 6v9h-5v-5H8v5H3z"/></svg>
+                <span class="nav-label label-full">Museum Project</span>
+                <span class="nav-label label-short">Museum</span>
+            </a>
+            <a class="page-link" href="#sites" data-scroll-link data-section="sites">
+                <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4zM4 9h16M8 6v3"/></svg>
+                <span class="nav-label">Websites</span>
+            </a>
         </nav>
     </header>
 
@@ -48,9 +62,11 @@
                 </h1>
                 <div class="hero-about">
                     <p class="hero-about-label">About me</p>
-                    <p class="hero-subtitle">
+                    <p class="hero-subtitle desktop-only">
                         Game Developer with a strong background in Unreal Engine, C++ and Blueprints, focused on gameplay systems, immersive experiences and real-time 3D environments. Experienced in designing and implementing interactive mechanics, VR applications and gameplay features through academic and independent projects. Passionate about creating polished player experiences and continuously improving both technical and game development skills.
-
+                    </p>
+                    <p class="hero-subtitle mobile-only">
+                        Game Developer working with Unreal Engine, C++ and Blueprints. I build gameplay systems, VR experiences and custom websites with real-time 3D.
                     </p>
                     <div class="hero-highlights" aria-label="Focus areas">
                         <span>Unreal Engine</span>
@@ -259,92 +275,12 @@
                         </p>
                     </div>
                     <div class="sites-count" aria-hidden="true">
-                        <strong>02</strong>
+                        <strong data-sites-count>02</strong>
                         <span>Client projects</span>
                     </div>
                 </div>
 
-                <div class="site-list">
-                    <article class="site-project" data-reveal>
-                        <div class="site-preview" data-site-tilt>
-                            <div class="browser-frame">
-                                <div class="browser-bar" aria-hidden="true">
-                                    <span class="browser-dots"><i></i><i></i><i></i></span>
-                                    <span class="browser-url">La Crema &middot; Coffee &amp; Patisserie</span>
-                                </div>
-                                <button class="site-shot-trigger" type="button" data-museum-lightbox-trigger aria-label="Open La Crema preview">
-                                    <img class="site-shot" data-site-shot="lacrema" alt="La Crema website homepage with a 3D coffee cup and bougatsa on marble" loading="lazy">
-                                </button>
-                            </div>
-                            <span class="site-preview-glow site-preview-glow-warm" aria-hidden="true"></span>
-                        </div>
-
-                        <div class="site-info">
-                            <div class="site-meta">
-                                <span class="site-index">01</span>
-                                <span class="site-client">Caf&eacute; &amp; Patisserie &middot; Veria, Greece</span>
-                            </div>
-                            <h3 class="site-title">La Crema</h3>
-                            <p class="site-description">
-                                A warm, editorial website for a patisserie running since 1976. The homepage opens on a
-                                real-time 3D scene, a branded coffee cup and bougatsa on marble, that follows the visitor
-                                through the coffee, bougatsa, patisserie and events chapters.
-                            </p>
-                            <ul class="site-features">
-                                <li>Real-time 3D scene in Three.js with custom GLB models</li>
-                                <li>Scroll-driven storytelling across the menu chapters</li>
-                                <li>Local SEO with structured data for the caf&eacute;</li>
-                                <li>Responsive, mobile-first layout and navigation</li>
-                            </ul>
-                            <div class="credential-tags site-tags">
-                                <span>Three.js</span>
-                                <span>WebGL</span>
-                                <span>3D Models</span>
-                                <span>Vite</span>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article class="site-project site-project-reverse" data-reveal>
-                        <div class="site-preview" data-site-tilt>
-                            <div class="browser-frame">
-                                <div class="browser-bar" aria-hidden="true">
-                                    <span class="browser-dots"><i></i><i></i><i></i></span>
-                                    <span class="browser-url">FireZone by Pasvantidis</span>
-                                </div>
-                                <button class="site-shot-trigger" type="button" data-museum-lightbox-trigger aria-label="Open FireZone preview">
-                                    <img class="site-shot" data-site-shot="firezone" alt="FireZone website homepage with a cinematic fire extinguisher scene" loading="lazy">
-                                </button>
-                            </div>
-                            <span class="site-preview-glow site-preview-glow-fire" aria-hidden="true"></span>
-                        </div>
-
-                        <div class="site-info">
-                            <div class="site-meta">
-                                <span class="site-index">02</span>
-                                <span class="site-client">Fire Safety Equipment &middot; Veria, Greece</span>
-                            </div>
-                            <h3 class="site-title">FireZone</h3>
-                            <p class="site-description">
-                                A cinematic website for a fire-safety company with over 30 years of experience. A
-                                Blender-rendered hero with live fire and reflections animates as the visitor scrolls,
-                                leading into services, the extinguisher catalogue and contact details.
-                            </p>
-                            <ul class="site-features">
-                                <li>Scroll-driven hero animation rendered frame by frame in Blender</li>
-                                <li>Canvas-animated fire, reflections and branded intro loader</li>
-                                <li>Dark / light theme that remembers the visitor's choice</li>
-                                <li>Lenis smooth scrolling that respects reduced motion</li>
-                            </ul>
-                            <div class="credential-tags site-tags">
-                                <span>Blender</span>
-                                <span>Canvas</span>
-                                <span>Lenis</span>
-                                <span>JavaScript</span>
-                            </div>
-                        </div>
-                    </article>
-                </div>
+                <div class="site-grid" data-site-grid></div>
             </div>
         </section>
 
@@ -367,6 +303,26 @@
             </div>
         </footer>
     </main>
+
+    <div class="site-detail" data-site-detail hidden aria-hidden="true">
+        <button class="site-detail-backdrop" type="button" data-site-detail-close aria-label="Close website project"></button>
+        <div class="site-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="site-detail-title">
+            <button class="site-detail-close" type="button" data-site-detail-close aria-label="Close project">Close</button>
+            <div class="site-detail-media">
+                <img class="site-detail-image" data-site-detail-image alt="">
+            </div>
+            <div class="site-detail-copy">
+                <div class="site-meta">
+                    <span class="site-index" data-site-detail-index>01</span>
+                    <span class="site-client" data-site-detail-client></span>
+                </div>
+                <h3 class="site-title" id="site-detail-title" data-site-detail-title></h3>
+                <p class="site-description" data-site-detail-description></p>
+                <ul class="site-features" data-site-detail-features></ul>
+                <div class="credential-tags site-tags" data-site-detail-tags></div>
+            </div>
+        </div>
+    </div>
 
     <div class="museum-lightbox" data-museum-lightbox hidden aria-hidden="true">
         <button class="museum-lightbox-backdrop" type="button" data-museum-lightbox-close aria-label="Close fullscreen preview"></button>
