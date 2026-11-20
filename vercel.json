@@ -1,5 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/home", "destination": "/index.html" },
+    { "source": "/credentials", "destination": "/index.html" },
+    { "source": "/museum", "destination": "/index.html" },
+    { "source": "/Museum", "destination": "/index.html" },
+    { "source": "/meusuam", "destination": "/index.html" },
+    { "source": "/websites", "destination": "/index.html" },
+    { "source": "/sites", "destination": "/index.html" }
+  ]
 }

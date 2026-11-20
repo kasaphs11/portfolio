@@ -878,6 +878,7 @@ const updateSiteLoaderProgress = (completed, total) =>
 const revealSite = () =>
 {
     document.body.classList.remove('site-loading')
+    openLocationSection()
 
     if(!siteLoader)
     {
@@ -1835,17 +1836,64 @@ const updateActiveSection = () =>
 
 let pageJumpTimeout = null
 
+const sectionPaths = {
+    home: '/home',
+    credentials: '/credentials',
+    museum: '/Museum',
+    sites: '/websites'
+}
+
+const sectionForPath = (path) =>
+{
+    const normalized = path.toLowerCase().replace(/\/+$/, '') || '/'
+    const aliases = { '/': 'home', '/meusuam': 'museum', '/sites': 'sites' }
+    return aliases[normalized] ?? Object.keys(sectionPaths).find((key) => sectionPaths[key].toLowerCase() === normalized)
+}
+
+const jumpToSection = (section) =>
+{
+    const target = document.getElementById(section)
+    if(!target) return
+    const card = target.querySelector('.section-card') ?? target
+    const offset = sizes.width <= 900
+        ? 12
+        : (siteNav ? siteNav.getBoundingClientRect().bottom : 0) + 24
+    const top = section === 'home' ? 0 : Math.max(card.getBoundingClientRect().top + getPageScroll() - offset, 0)
+    window.scrollTo({ top, behavior: 'instant' })
+    updateActiveSection()
+}
+
+const openLocationSection = () =>
+{
+    window.clearTimeout(pageJumpTimeout)
+    document.body.classList.remove('is-page-jumping')
+    const hashSection = window.location.hash.slice(1)
+    const section = Object.hasOwn(sectionPaths, hashSection)
+        ? hashSection
+        : sectionForPath(window.location.pathname)
+    if(section) jumpToSection(section)
+}
+
+window.history.scrollRestoration = 'manual'
+window.addEventListener('popstate', openLocationSection)
+window.addEventListener('hashchange', openLocationSection)
+window.addEventListener('load', openLocationSection)
+
 scrollLinks.forEach((link) =>
 {
-    const targetSelector = link.getAttribute('href')
+    const href = link.getAttribute('href') ?? ''
+    const section = href.startsWith('#') ? href.slice(1) : sectionForPath(href)
+    const targetSelector = section ? `#${section}` : null
 
     if(!targetSelector || !targetSelector.startsWith('#'))
     {
         return
     }
+    link.setAttribute('href', sectionPaths[section])
 
     link.addEventListener('click', (event) =>
     {
+        if(event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
         const targetElement = document.querySelector(targetSelector)
 
         if(!targetElement)
@@ -1854,17 +1902,12 @@ scrollLinks.forEach((link) =>
         }
 
         event.preventDefault()
-
-        const card = targetElement.querySelector('.section-card') ?? targetElement
-        const isMobile = sizes.width <= 900
-        const offset = isMobile
-            ? 12
-            : (siteNav ? siteNav.getBoundingClientRect().bottom : 0) + 24
-        const top = targetSelector === '#home'
-            ? 0
-            : Math.max(card.getBoundingClientRect().top + getPageScroll() - offset, 0)
-
-        const jump = () => window.scrollTo({ top, behavior: 'instant' })
+        if(window.location.pathname !== sectionPaths[section] || window.location.hash)
+        {
+            window.history.pushState(null, '', sectionPaths[section])
+        }
+        window.clearTimeout(pageJumpTimeout)
+        const jump = () => jumpToSection(section)
 
         if(prefersReducedMotion)
         {
@@ -1888,6 +1931,7 @@ scrollLinks.forEach((link) =>
 })
 
 updateLayout()
+openLocationSection()
 updateActiveSection()
 
 window.addEventListener('resize', () =>
