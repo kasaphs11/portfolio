@@ -1581,6 +1581,67 @@ body.museum-lightbox-open
         box-shadow 0.28s ease;
 }
 
+.site-project
+{
+    min-width: 0;
+}
+
+.site-live-link
+{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 14px;
+    padding: 11px 18px;
+    border: 1px solid rgba(200, 115, 255, 0.38);
+    border-radius: 999px;
+    background: rgba(166, 0, 255, 0.12);
+    color: #f0e3ff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.site-live-link:hover
+{
+    background: rgba(166, 0, 255, 0.26);
+}
+
+.site-live-link:focus-visible
+{
+    outline: 2px solid #e6c6ff;
+    outline-offset: 4px;
+}
+
+.site-detail-live
+{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    width: fit-content;
+    max-width: 100%;
+    padding: 14px 20px;
+    border-radius: 14px;
+    background: #8436bc;
+    border-color: #b875ed;
+    color: #ffffff;
+    font-size: 1rem;
+}
+
+.site-detail-live:hover
+{
+    background: #9947d1;
+}
+
+.site-live-address
+{
+    font-size: 0.875rem;
+    font-weight: 400;
+    overflow-wrap: anywhere;
+}
+
 .site-cover:hover,
 .site-cover:focus-visible
 {

@@ -45,6 +45,8 @@ const siteDetailTitle = document.querySelector('[data-site-detail-title]')
 const siteDetailDescription = document.querySelector('[data-site-detail-description]')
 const siteDetailFeatures = document.querySelector('[data-site-detail-features]')
 const siteDetailTags = document.querySelector('[data-site-detail-tags]')
+const siteDetailLive = document.querySelector('[data-site-detail-live]')
+const siteDetailAddress = document.querySelector('[data-site-detail-address]')
 const siteDetailCloseButtons = [...document.querySelectorAll('[data-site-detail-close]')]
 const revealElements = [...document.querySelectorAll('[data-reveal]')]
 const currentYearElements = [...document.querySelectorAll('[data-current-year]')]
@@ -146,7 +148,7 @@ const museumVideoModules = import.meta.glob('../museum/*.{mp4,webm,ogg}', {
     import: 'default'
 })
 
-const siteShotModules = import.meta.glob('../sites/*.{jpg,jpeg,png,webp}', {
+const siteShotModules = import.meta.glob('../sites/*.{jpg,jpeg,png,webp,svg}', {
     eager: true,
     import: 'default'
 })
@@ -162,6 +164,7 @@ const siteShotUrlsByName = Object.fromEntries(
 const websiteProjects = [
     {
         id: 'lacrema',
+        url: 'https://la-crema-pi.vercel.app/',
         title: 'La Crema',
         client: 'Café & Patisserie · Veria, Greece',
         alt: 'La Crema website homepage with a 3D coffee cup and bougatsa on marble',
@@ -176,6 +179,7 @@ const websiteProjects = [
     },
     {
         id: 'firezone',
+        url: 'https://firezone.gr/',
         title: 'FireZone',
         client: 'Fire Safety Equipment · Veria, Greece',
         alt: 'FireZone website homepage with a cinematic fire extinguisher scene',
@@ -187,6 +191,16 @@ const websiteProjects = [
             'Lenis smooth scrolling that respects reduced motion'
         ],
         tags: ['Blender', 'Canvas', 'Lenis', 'JavaScript']
+    },
+    {
+        id: 'euphoria',
+        url: 'https://euphoriacenter.vercel.app/',
+        title: 'Euphoria Center',
+        client: 'Euphoria Center',
+        alt: 'Euphoria Center project cover',
+        description: 'A website project for Euphoria Center. Explore the live website to see the full experience.',
+        features: [],
+        tags: ['Website']
     }
 ]
 
@@ -216,6 +230,15 @@ const openSiteDetail = (project, trigger) =>
     }
 
     activeSiteCover = trigger
+    if(siteDetailLive)
+    {
+        siteDetailLive.href = project.url
+        siteDetailLive.setAttribute('aria-label', `View ${project.title} live (opens in a new tab)`)
+    }
+    if(siteDetailAddress)
+    {
+        siteDetailAddress.textContent = new URL(project.url).hostname
+    }
     const imageUrl = siteShotUrlsByName[project.id]
 
     if(siteDetailImage && imageUrl)
@@ -290,6 +313,8 @@ const renderSiteGrid = () =>
     siteGrid.replaceChildren(
         ...websiteProjects.map((project, index) =>
         {
+            const card = document.createElement('article')
+            card.className = 'site-project'
             const button = document.createElement('button')
             button.className = 'site-cover'
             button.type = 'button'
@@ -325,7 +350,15 @@ const renderSiteGrid = () =>
             button.append(image, shade, body)
             button.addEventListener('click', () => openSiteDetail(project, button))
 
-            return button
+            const liveLink = document.createElement('a')
+            liveLink.className = 'site-live-link'
+            liveLink.href = project.url
+            liveLink.target = '_blank'
+            liveLink.rel = 'noopener noreferrer'
+            liveLink.textContent = 'View live website'
+            liveLink.setAttribute('aria-label', `View ${project.title} live (opens in a new tab)`)
+            card.append(button, liveLink)
+            return card
         })
     )
 }
